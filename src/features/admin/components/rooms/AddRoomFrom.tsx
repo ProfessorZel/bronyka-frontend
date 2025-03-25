@@ -86,6 +86,7 @@ export function AddRoomFrom() {
       const roomData = res.data;
 
       mutateSwrRoomsCache(roomData, !isEditMode && isFormValid(formData));
+      nav("/admin/rooms");
     } catch (e) {
       const err = e as AxiosError;
 

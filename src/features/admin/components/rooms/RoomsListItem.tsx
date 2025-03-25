@@ -3,8 +3,10 @@ import { MEETING_ROOMS_API } from "@/app/shared/constants";
 import { userConfirmAction } from "@/app/shared/utils";
 import { MeetingRoom } from "@/features/meeting_rooms/types";
 import { Button, List } from "antd";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { IoCalendar } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router";
+import { mutate } from "swr";
 
 export function RoomsListItem({ id, description, name }: MeetingRoom) {
   const nav = useNavigate();
@@ -28,11 +30,17 @@ export function RoomsListItem({ id, description, name }: MeetingRoom) {
           shape="circle"
           title="Удалить"
         />
-        <Button
+        {/* <Button
           icon={<MdEdit />}
           onClick={() => nav(`edit/${id}`)}
           shape="circle"
           title="Редактировать"
+        /> */}
+        <Button
+          icon={<IoCalendar />}
+          onClick={() => nav(`reservations/${id}`)}
+          shape="circle"
+          title="Расписание бронирования"
         />
       </div>
     </List.Item>
@@ -46,10 +54,28 @@ export function RoomsListItem({ id, description, name }: MeetingRoom) {
 
       if (!confirm) return;
 
-      const response = await api.delete(`${MEETING_ROOMS_API}/${id}`);
-      console.log(response);
+      const response = await api.delete<MeetingRoom>(
+        `${MEETING_ROOMS_API}/${id}`
+      );
+      mutateSwrRoomsCache(response.data);
     } catch (e) {
       console.log(e);
     }
   }
+}
+
+async function mutateSwrRoomsCache(room?: MeetingRoom) {
+  if (!room) return;
+
+  await mutate(
+    MEETING_ROOMS_API,
+    (data?: MeetingRoom[]) => {
+      if (!data) return data;
+
+      return data.filter((item) => item.id !== room.id);
+    },
+    {
+      revalidate: false,
+    }
+  );
 }

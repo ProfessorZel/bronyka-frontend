@@ -2,6 +2,7 @@ import {
   AdminAddRoomFrom,
   AdminAddUserForm,
   AdminLayout,
+  AdminReservationList,
   AdminRoomsList,
   AdminUsersList,
 } from "@/features/admin";
@@ -36,6 +37,10 @@ function AppRouter() {
           <Route path="rooms" element={<AdminRoomsList />}>
             <Route path="new" element={<AdminAddRoomFrom />} />
             <Route path="edit/:roomId" element={<AdminAddRoomFrom />} />
+            <Route
+              path="reservations/:roomId"
+              element={<AdminReservationList />}
+            />
           </Route>
           <Route path="rooms" />
         </Route>

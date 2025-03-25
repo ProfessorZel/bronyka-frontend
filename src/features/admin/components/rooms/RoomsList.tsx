@@ -26,7 +26,7 @@ export function RoomsList() {
         style={{ paddingBottom: 100 }}
       >
         <List
-          className="bg-white  rounded-md"
+          className="bg-white rounded-md"
           style={{ padding: 10 }}
           dataSource={rooms}
           renderItem={(room) => <RoomsListItem {...room} />}
