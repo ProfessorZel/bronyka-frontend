@@ -1,11 +1,14 @@
 import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
 import { useApi } from "@/app/shared/api/useApi";
 import { RESERVATIONS_API } from "@/app/shared/constants";
-import { Alert, Button, Card, DatePicker, Form } from "antd";
+import { useNotifications } from "@/app/shared/hooks/useNotifications";
+import { Button, Card, DatePicker, Form } from "antd";
 import { AxiosError } from "axios";
 import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import { useParams } from "react-router";
+import { mutate } from "swr";
+import { Reservation } from "../types";
 
 interface ReservationFormData {
   from: Date;
@@ -22,11 +25,11 @@ const defaultReservationFormData: ReservationFormData = {
 
 export function ReservationForm() {
   const api = useApi();
-  const [error, setError] = useState<string[] | null>();
   const { roomId } = useParams();
   const [reservationForm, setReservationForm] = useState<ReservationFormData>(
     defaultReservationFormData
   );
+  const { send, ctx } = useNotifications();
 
   const set = (attrs: Partial<ReservationFormData>) => {
     setReservationForm({ ...reservationForm, ...attrs });
@@ -39,7 +42,6 @@ export function ReservationForm() {
           <Form.Item>
             <div className="flex flex-col gap-6">
               <DatePicker
-                onFocus={() => setError(null)}
                 showTime
                 value={dayjs(reservationForm.from)}
                 onChange={(_: Dayjs, dateStr: string | string[]) => {
@@ -48,7 +50,6 @@ export function ReservationForm() {
                 }}
               />
               <DatePicker
-                onFocus={() => setError(null)}
                 showTime
                 value={dayjs(reservationForm.to)}
                 onChange={(_: Dayjs, dateStr: string | string[]) => {
@@ -63,20 +64,15 @@ export function ReservationForm() {
           </Button>
         </Form>
       </Card>
-      {error &&
-        error.map((msg, index) => (
-          <Alert message={msg} type="error" key={index} showIcon />
-        ))}
+      {ctx}
     </div>
   );
 
   async function handleReservation() {
-    setError(null);
-
     const { from, to } = reservationForm;
 
     if (from >= to) {
-      setError(["Invalid date and time range for reservation"]);
+      send("error", ["Invalid date and time range for reservation"]);
       return;
     }
 
@@ -87,10 +83,10 @@ export function ReservationForm() {
     };
 
     try {
-      const res = await api.post(RESERVATIONS_API, payload);
+      const res = await api.post<Reservation>(RESERVATIONS_API, payload);
 
       if (res.status === 200) {
-        console.log("Reservation successful:", res.data);
+        mutate(() => true, undefined, { revalidate: true });
         return res.data;
       }
     } catch (error) {
@@ -100,13 +96,20 @@ export function ReservationForm() {
         const errHasData = err as AxiosError & {
           data: ResponseApiUnprocessableEntity;
         };
-        const errorMessages = errHasData.data.detail
-          .flatMap(({ msg }) => (msg ? [msg] : []))
-          .filter(Boolean);
-        setError(errorMessages);
+
+        if (Array.isArray(errHasData.data.detail)) {
+          const errorMessages = errHasData.data.detail
+            .flatMap(({ msg }) => (msg ? [msg] : []))
+            .filter(Boolean);
+
+          send("error", errorMessages);
+        }
+
+        if (typeof errHasData.data.detail === "string") {
+          send("error", [errHasData.data.detail]);
+        }
       } else {
-        setError(["An unexpected error occurred"]);
-        console.error("Reservation error:", err);
+        send("error", ["Произошла непредвиденная ошибка"]);
       }
     }
   }

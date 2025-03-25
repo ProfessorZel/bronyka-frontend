@@ -5,6 +5,7 @@ import { User } from "@/features/auth/types";
 import { Button, List } from "antd";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router";
+import { mutate } from "swr";
 
 export function UsersListItem({ email, fio, id }: User) {
   const nav = useNavigate();
@@ -46,8 +47,8 @@ export function UsersListItem({ email, fio, id }: User) {
 
       if (!confirm) return;
 
-      const response = await api.delete(`${USERS_API}/${id}`);
-      console.log(response);
+      await api.delete(`${USERS_API}/${id}`);
+      await mutate(() => true, undefined, { revalidate: true });
     } catch (e) {
       console.log(e);
     }

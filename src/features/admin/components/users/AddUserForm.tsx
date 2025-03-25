@@ -110,14 +110,13 @@ export function AddUserForm() {
 
   async function handleCreateUser() {
     try {
-      const res =
-        !isEditMode && isFormValid(formData)
-          ? await post<User>(`${AUTH_API}/register`, formData)
-          : await patch<User>(`${USERS_API}/${userId}`, formData);
+      !isEditMode && isFormValid(formData)
+        ? await post<User>(`${AUTH_API}/register`, formData)
+        : await patch<User>(`${USERS_API}/${userId}`, formData);
 
-      const userDate: User = res.data;
-
-      mutateSwrUsersCache(userDate, !isEditMode && isFormValid(formData));
+      await mutate(() => true, undefined, {
+        revalidate: true,
+      });
 
       nav("/admin/users");
     } catch (e) {
@@ -133,25 +132,8 @@ export function AddUserForm() {
 
         send("error", errorMessages);
       } else {
-        send("error", ["An unexpected error occurred"]);
-        console.error("Reservation error:", err);
+        send("error", ["Произошла непредвиденная ошибка"]);
       }
     }
   }
-}
-
-async function mutateSwrUsersCache(user?: User, create: boolean = true) {
-  if (!user) return;
-
-  await mutate(
-    USERS_API,
-    (data?: User[]) => {
-      if (!data) return data;
-      if (create) return [...data, user];
-      return data.map((item) => (item.id === user.id ? user : item));
-    },
-    {
-      revalidate: false,
-    }
-  );
 }
