@@ -6,7 +6,7 @@ import {
   AdminRoomsList,
   AdminUsersList,
 } from "@/features/admin";
-import { Authenticator } from "@/features/auth";
+import { Accessor, Authenticator } from "@/features/auth";
 import {
   MeetingRoom,
   MeetingRoomsLayout,
@@ -24,12 +24,11 @@ interface ProviderProps {
 
 const NavigationToIndex = () => <Navigate to="/meeting_rooms" replace />;
 
-function AppRouter() {
+function AdminRoutes() {
   return (
-    <Routes>
-      <Route element={<AppLayout />}>
-        {/* <Route path="admin" element={<Accessor />}> */}
-        <Route path="admin" element={<AdminLayout />}>
+    <Accessor>
+      <Routes>
+        <Route path="/" element={<AdminLayout />}>
           <Route path="users" element={<AdminUsersList />}>
             <Route path="new" element={<AdminAddUserForm />} />
             <Route path="edit/:userId" element={<AdminAddUserForm />} />
@@ -42,9 +41,17 @@ function AppRouter() {
               element={<AdminReservationList />}
             />
           </Route>
-          <Route path="rooms" />
         </Route>
-        {/* </Route> */}
+      </Routes>
+    </Accessor>
+  );
+}
+
+function AppRouter() {
+  return (
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/" index element={<NavigationToIndex />} />
         <Route path="meeting_rooms" element={<MeetingRoomsLayout />}>
           <Route index element={<MeetingRoomsList />} />
