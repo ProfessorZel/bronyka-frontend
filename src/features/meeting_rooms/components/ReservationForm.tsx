@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import { mutate } from "swr";
 import { Reservation } from "../types";
+import { toNaiveISOString } from '@/app/shared/utils';
 
 interface ReservationFormData {
   from: Date;
@@ -113,8 +114,4 @@ export function ReservationForm() {
       }
     }
   }
-}
-
-function toNaiveISOString(date: Date) {
-  return date.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
 }
