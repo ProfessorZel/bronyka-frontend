@@ -10,3 +10,8 @@ export function dateTimeFormatter(dtString: string) {
     timeStyle: "short",
   }).format(dt);
 }
+
+export function toNaiveISOString(date: Date) {
+  const currentDate = new Date(date.getTime() + 3 * 3600000);
+  return currentDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+}
