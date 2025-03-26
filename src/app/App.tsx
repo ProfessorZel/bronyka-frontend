@@ -12,10 +12,11 @@ import {
   MeetingRoomsLayout,
   MeetingRoomsList,
 } from "@/features/meeting_rooms";
+import { ProfileLayout } from "@/features/profile";
 import "antd/dist/reset.css";
 import { Navigate, Route, Routes } from "react-router";
 import { SWRConfig, SWRConfiguration } from "swr";
-import { AppLayout } from "./layout";
+import { AppLayout } from "./AppLayout";
 import { useApi } from "./shared/api/useApi";
 
 interface ProviderProps {
@@ -51,6 +52,7 @@ function AppRouter() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
+        <Route path="profile" element={<ProfileLayout />} />
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/" index element={<NavigationToIndex />} />
         <Route path="meeting_rooms" element={<MeetingRoomsLayout />}>
