@@ -108,10 +108,19 @@ export function AddUserForm() {
     set({ is_superuser: e.target.checked });
   }
 
+  async function create() {
+    const created = await post<User>(`${AUTH_API}/register`, formData);
+
+    if (created.status === 201 && formData.is_superuser) {
+      const userId = created.data.id;
+      userId && (await patch<User>(`${USERS_API}/${userId}`, formData));
+    }
+  }
+
   async function handleCreateUser() {
     try {
       !isEditMode && isFormValid(formData)
-        ? await post<User>(`${AUTH_API}/register`, formData)
+        ? await create()
         : await patch<User>(`${USERS_API}/${userId}`, formData);
 
       await mutate(() => true, undefined, {
