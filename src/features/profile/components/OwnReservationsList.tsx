@@ -1,10 +1,13 @@
-import { dateTimeFormatter } from "@/app/shared/utils";
-import { useMeetingRooms } from "@/features/meeting_rooms/hooks/useMeetingRooms";
-import { Reservation } from "@/features/meeting_rooms/types";
-import { Button, FloatButton, List, Switch } from "antd";
-import { useEffect, useState } from "react";
-import { MdDelete } from "react-icons/md";
-import { useOwnReservations } from "../hooks/useOwnReservations";
+import { useApi } from '@/app/shared/api/useApi';
+import { RESERVATIONS_API } from '@/app/shared/constants';
+import { dateTimeFormatter } from '@/app/shared/utils';
+import { useMeetingRooms } from '@/features/meeting_rooms/hooks/useMeetingRooms';
+import { Reservation } from '@/features/meeting_rooms/types';
+import { Button, FloatButton, List, Switch } from 'antd';
+import { useEffect, useState } from 'react';
+import { MdDelete } from 'react-icons/md';
+import { mutate } from 'swr';
+import { useOwnReservations } from '../hooks/useOwnReservations';
 FloatButton;
 
 interface HistoryToggleProps {
@@ -59,20 +62,21 @@ function ListHeader({ checked, onChange }: HistoryToggleProps) {
   return (
     <div className="flex items-center gap-5" style={{ padding: 10 }}>
       <span
-        className={`font-semibold ${checked ? "text-blue-500" : "text-black"}`}
+        className={`font-semibold ${checked ? 'text-blue-500' : 'text-black'}`}
       >
         Мои заявки на бронирование
       </span>
       <Switch checked={checked} onChange={onChange} />
-      <span className={`font-bold ${checked ? "text-blue-500" : "text-black"}`}>
+      <span className={`font-bold ${checked ? 'text-blue-500' : 'text-black'}`}>
         История
       </span>
     </div>
   );
 }
 
-function ListItem({ from_reserve, to_reserve, name }: ListItemList) {
+function ListItem({ from_reserve, to_reserve, name, id }: ListItemList) {
   const datetime = `${df(from_reserve)} - ${df(to_reserve)}`;
+  const api = useApi();
 
   return (
     <List.Item>
@@ -92,9 +96,20 @@ function ListItem({ from_reserve, to_reserve, name }: ListItemList) {
           color="red"
           variant="solid"
           icon={<MdDelete />}
+          onClick={handleDeleteReservation}
           shape="circle"
         />
       </div>
     </List.Item>
   );
+
+  async function handleDeleteReservation() {
+    try {
+      await api.delete(`${RESERVATIONS_API}/${id}`);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      await mutate(() => true, undefined, { revalidate: true });
+    }
+  }
 }
