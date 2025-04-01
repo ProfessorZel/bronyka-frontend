@@ -1,15 +1,16 @@
-import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
-import { useApi } from "@/app/shared/api/useApi";
-import { RESERVATIONS_API } from "@/app/shared/constants";
-import { useNotifications } from "@/app/shared/hooks/useNotifications";
-import { Button, Card, DatePicker, Form } from "antd";
-import { AxiosError } from "axios";
-import dayjs, { Dayjs } from "dayjs";
-import { useState } from "react";
-import { useParams } from "react-router";
-import { mutate } from "swr";
-import { Reservation } from "../types";
+import { ResponseApiUnprocessableEntity } from '@/app/shared/api/types';
+import { useApi } from '@/app/shared/api/useApi';
+import { RESERVATIONS_API } from '@/app/shared/constants';
+import { useNotifications } from '@/app/shared/hooks/useNotifications';
 import { toNaiveISOString } from '@/app/shared/utils';
+import { Button, Card, DatePicker, Form } from 'antd';
+import { AxiosError } from 'axios';
+import dayjs, { Dayjs } from 'dayjs';
+import { useMemo, useState } from 'react';
+import { useParams } from 'react-router';
+import { mutate } from 'swr';
+import { useMeetingRooms } from '../hooks/useMeetingRooms';
+import { Reservation } from '../types';
 
 interface ReservationFormData {
   from: Date;
@@ -27,10 +28,19 @@ const defaultReservationFormData: ReservationFormData = {
 export function ReservationForm() {
   const api = useApi();
   const { roomId } = useParams();
+  const rooms = useMeetingRooms();
   const [reservationForm, setReservationForm] = useState<ReservationFormData>(
-    defaultReservationFormData
+    defaultReservationFormData,
   );
   const { send, ctx } = useNotifications();
+
+  const formTitle = useMemo(() => {
+    const prefix = 'Оформить бронирование: ';
+    const roomIdAsNumber = parseInt(roomId ?? '');
+    const roomName = rooms.find((room) => room.id === roomIdAsNumber)?.name;
+
+    return `${prefix} ${roomName}`;
+  }, [rooms]);
 
   const set = (attrs: Partial<ReservationFormData>) => {
     setReservationForm({ ...reservationForm, ...attrs });
@@ -38,7 +48,7 @@ export function ReservationForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card title="Оформить бронирование">
+      <Card title={formTitle}>
         <Form onSubmitCapture={handleReservation}>
           <Form.Item>
             <div className="flex flex-col gap-6">
@@ -73,7 +83,7 @@ export function ReservationForm() {
     const { from, to } = reservationForm;
 
     if (from >= to) {
-      send("error", ["Invalid date and time range for reservation"]);
+      send('error', ['Invalid date and time range for reservation']);
       return;
     }
 
@@ -84,12 +94,7 @@ export function ReservationForm() {
     };
 
     try {
-      const res = await api.post<Reservation>(RESERVATIONS_API, payload);
-
-      if (res.status === 200) {
-        mutate(() => true, undefined, { revalidate: true });
-        return res.data;
-      }
+      await api.post<Reservation>(RESERVATIONS_API, payload);
     } catch (error) {
       const err = error as AxiosError;
 
@@ -103,15 +108,17 @@ export function ReservationForm() {
             .flatMap(({ msg }) => (msg ? [msg] : []))
             .filter(Boolean);
 
-          send("error", errorMessages);
+          send('error', errorMessages);
         }
 
-        if (typeof errHasData.data.detail === "string") {
-          send("error", [errHasData.data.detail]);
+        if (typeof errHasData.data.detail === 'string') {
+          send('error', [errHasData.data.detail]);
         }
       } else {
-        send("error", ["Произошла непредвиденная ошибка"]);
+        send('error', ['Произошла непредвиденная ошибка']);
       }
+    } finally {
+      mutate(() => true, undefined, { revalidate: true });
     }
   }
 }
