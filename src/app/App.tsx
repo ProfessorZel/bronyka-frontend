@@ -5,19 +5,19 @@ import {
   AdminReservationList,
   AdminRoomsList,
   AdminUsersList,
-} from "@/features/admin";
-import { Accessor, Authenticator } from "@/features/auth";
+} from '@/features/admin';
+import { Accessor, Authenticator } from '@/features/auth';
 import {
   MeetingRoom,
   MeetingRoomsLayout,
   MeetingRoomsList,
-} from "@/features/meeting_rooms";
-import { ProfileLayout } from "@/features/profile";
-import "antd/dist/reset.css";
-import { Navigate, Route, Routes } from "react-router";
-import { SWRConfig, SWRConfiguration } from "swr";
-import { AppLayout } from "./AppLayout";
-import { useApi } from "./shared/api/useApi";
+} from '@/features/meeting_rooms';
+import { ProfileLayout } from '@/features/profile';
+import 'antd/dist/reset.css';
+import { Navigate, Route, Routes } from 'react-router';
+import { SWRConfig, SWRConfiguration } from 'swr';
+import { AppLayout } from './AppLayout';
+import { useApi } from './shared/api/useApi';
 
 interface ProviderProps {
   children?: React.ReactNode;
