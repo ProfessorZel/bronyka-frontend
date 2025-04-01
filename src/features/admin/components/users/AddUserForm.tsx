@@ -1,7 +1,7 @@
-import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
-import { useApi } from "@/app/shared/api/useApi";
-import { AUTH_API, USERS_API } from "@/app/shared/constants";
-import { useNotifications } from "@/app/shared/hooks/useNotifications";
+import { ResponseApiUnprocessableEntity } from '@/app/shared/api/types';
+import { useApi } from '@/app/shared/api/useApi';
+import { AUTH_API, USERS_API } from '@/app/shared/constants';
+import { useNotifications } from '@/app/shared/hooks/useNotifications';
 import {
   Button,
   Checkbox,
@@ -9,25 +9,25 @@ import {
   Drawer,
   Form,
   Input,
-} from "antd";
-import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { mutate } from "swr";
-import { useUser } from "../../hooks/useUser";
-import { User } from "../../types";
-import { isFormValid } from "../../utils";
+} from 'antd';
+import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { mutate } from 'swr';
+import { useUser } from '../../hooks/useUser';
+import { User } from '../../types';
+import { isFormValid } from '../../utils';
 
-type AddUserFormData = Omit<User, "id">;
+type AddUserFormData = Omit<User, 'id'>;
 
 const defaultAddUserFormData: AddUserFormData = {
-  fio: "",
+  fio: '',
   is_active: true,
   is_superuser: false,
   is_verified: true,
-  birthdate: new Date().toISOString().split("T")[0],
-  email: "",
-  password: "",
+  birthdate: new Date().toISOString().split('T')[0],
+  email: '',
+  password: '',
 };
 
 export function AddUserForm() {
@@ -39,7 +39,7 @@ export function AddUserForm() {
   const initFormData = useUser(userId ? parseInt(userId) : undefined);
 
   const [formData, setFormData] = useState<AddUserFormData>(
-    defaultAddUserFormData
+    defaultAddUserFormData,
   );
 
   useEffect(() => {
@@ -52,29 +52,29 @@ export function AddUserForm() {
 
   const isEditMode = !!userId;
   const title = isEditMode
-    ? "Редактировать пользователя"
-    : "Создать пользователя";
+    ? 'Редактировать пользователя'
+    : 'Создать пользователя';
 
   return (
-    <Drawer title={title} size="large" onClose={() => nav("/admin/users")} open>
+    <Drawer title={title} size="large" onClose={() => nav('/admin/users')} open>
       <Form labelWrap onSubmitCapture={handleCreateUser} labelCol={{ span: 3 }}>
         <Form.Item label="ФИО">
           <Input
-            onChange={handleInputChange("fio")}
+            onChange={handleInputChange('fio')}
             value={formData.fio}
             type="text"
           />
         </Form.Item>
         <Form.Item label="Email">
           <Input
-            onChange={handleInputChange("email")}
+            onChange={handleInputChange('email')}
             value={formData.email}
             title="email"
           />
         </Form.Item>
         <Form.Item label="Пароль">
           <Input
-            onChange={handleInputChange("password")}
+            onChange={handleInputChange('password')}
             value={formData.password}
             type="text"
           />
@@ -91,7 +91,7 @@ export function AddUserForm() {
           htmlType="submit"
           type="primary"
         >
-          {isEditMode ? "Сохранить" : "Создать"}
+          {isEditMode ? 'Сохранить' : 'Создать'}
         </Button>
       </Form>
       {ctx}
@@ -105,7 +105,7 @@ export function AddUserForm() {
   }
 
   function handleCheckboxChange(e: CheckboxChangeEvent) {
-    set({ is_superuser: e.target.value });
+    set({ is_superuser: e.target.checked });
   }
 
   async function handleCreateUser() {
@@ -118,7 +118,7 @@ export function AddUserForm() {
         revalidate: true,
       });
 
-      nav("/admin/users");
+      nav('/admin/users');
     } catch (e) {
       const err = e as AxiosError;
 
@@ -127,12 +127,12 @@ export function AddUserForm() {
           data: ResponseApiUnprocessableEntity;
         };
         const errorMessages = errHasData.data.detail.flatMap(({ msg }) =>
-          msg ? [msg] : []
+          msg ? [msg] : [],
         );
 
-        send("error", errorMessages);
+        send('error', errorMessages);
       } else {
-        send("error", ["Произошла непредвиденная ошибка"]);
+        send('error', ['Произошла непредвиденная ошибка']);
       }
     }
   }

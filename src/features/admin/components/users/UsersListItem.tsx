@@ -1,13 +1,13 @@
-import { useApi } from "@/app/shared/api/useApi";
-import { USERS_API } from "@/app/shared/constants";
-import { userConfirmAction } from "@/app/shared/utils";
-import { User } from "@/features/auth/types";
-import { Button, List } from "antd";
-import { MdDelete, MdEdit } from "react-icons/md";
-import { useNavigate } from "react-router";
-import { mutate } from "swr";
+import { useApi } from '@/app/shared/api/useApi';
+import { USERS_API } from '@/app/shared/constants';
+import { userConfirmAction } from '@/app/shared/utils';
+import { User } from '@/features/auth/types';
+import { Button, List } from 'antd';
+import { MdDelete, MdEdit } from 'react-icons/md';
+import { useNavigate } from 'react-router';
+import { mutate } from 'swr';
 
-export function UsersListItem({ email, fio, id }: User) {
+export function UsersListItem({ email, fio, id, is_superuser }: User) {
   const nav = useNavigate();
   const api = useApi();
 
@@ -16,9 +16,10 @@ export function UsersListItem({ email, fio, id }: User) {
       style={{ padding: 10 }}
       className="flex flex-row justify-start items-center hover:border-none hover:bg-gray-100 duration-200"
     >
-      <div className="grid grid-flow-col grid-cols-[50px_1fr_1fr] w-full">
+      <div className="grid grid-flow-col grid-cols-[50px_1fr_100px_1fr] w-full">
         <span>{id}</span>
         <span> {fio}</span>
+        <span>{!is_superuser || 'admin'}</span>
         <span>{email}</span>
       </div>
 
@@ -48,9 +49,10 @@ export function UsersListItem({ email, fio, id }: User) {
       if (!confirm) return;
 
       await api.delete(`${USERS_API}/${id}`);
-      await mutate(() => true, undefined, { revalidate: true });
     } catch (e) {
       console.log(e);
+    } finally {
+      await mutate(() => true, undefined, { revalidate: true });
     }
   }
 }
