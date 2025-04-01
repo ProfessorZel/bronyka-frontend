@@ -56,7 +56,12 @@ export function ReservationForm() {
         >
           <Form.Item label="Начало бронирования">
             <DatePicker
-              showTime
+              showTime={{
+                minuteStep: 10,
+                showHour: true,
+                showMinute: true,
+              }}
+              allowClear={false}
               value={dayjs(reservationForm.from)}
               onChange={(_: Dayjs, dateStr: string | string[]) => {
                 const newDT = new Date(dateStr as string);
@@ -66,7 +71,12 @@ export function ReservationForm() {
           </Form.Item>
           <Form.Item label="Окончание бронирования">
             <DatePicker
-              showTime
+              showTime={{
+                minuteStep: 10,
+                showHour: true,
+                showMinute: true,
+              }}
+              allowClear={false}
               value={dayjs(reservationForm.to)}
               onChange={(_: Dayjs, dateStr: string | string[]) => {
                 const newDT = new Date(dateStr as string);

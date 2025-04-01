@@ -11,3 +11,11 @@ export interface Reservation {
   meetingroom_id: number;
   user_id: number;
 }
+
+export interface BigCalendarEvent {
+  title: string;
+  start: Date;
+  end: Date;
+  allDay?: boolean;
+  resource?: Partial<BigCalendarEvent>;
+}

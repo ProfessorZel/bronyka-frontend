@@ -1,5 +1,8 @@
+import { ResponseApiUnprocessableEntity } from '@/app/shared/api/types';
 import { useApi } from '@/app/shared/api/useApi';
 import { RESERVATIONS_API } from '@/app/shared/constants';
+import { useNotifications } from '@/app/shared/hooks/useNotifications';
+import { dateTimeFormatter, toNaiveISOString } from '@/app/shared/utils';
 import { useMeetingRoomReservation } from '@/features/meeting_rooms/hooks/useMeetingRoomReservation';
 import type { Reservation } from '@/features/meeting_rooms/types';
 import {
@@ -12,14 +15,11 @@ import {
   Form,
   Switch,
 } from 'antd';
+import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { mutate } from 'swr';
-import { dateTimeFormatter, toNaiveISOString } from '@/app/shared/utils';
-import { useNotifications } from '@/app/shared/hooks/useNotifications';
-import { AxiosError } from 'axios';
-import { ResponseApiUnprocessableEntity } from '@/app/shared/api/types';
 interface HistoryToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
@@ -132,6 +132,11 @@ function ReservationDTChangeForm({
       <Form.Item label="От">
         <DatePicker
           value={dayjs(reservationForm.from)}
+          showTime={{
+            minuteStep: 10,
+            showHour: true,
+            showMinute: true,
+          }}
           onChange={(_, dateStr) =>
             setReservationForm({
               ...reservationForm,
@@ -139,11 +144,15 @@ function ReservationDTChangeForm({
             })
           }
           allowClear={false}
-          showTime
         />
       </Form.Item>
       <Form.Item label="До">
         <DatePicker
+          showTime={{
+            minuteStep: 10,
+            showHour: true,
+            showMinute: true,
+          }}
           value={dayjs(reservationForm.to)}
           onChange={(_, dateStr) =>
             setReservationForm({
@@ -152,7 +161,6 @@ function ReservationDTChangeForm({
             })
           }
           allowClear={false}
-          showTime
         />
       </Form.Item>
       {ctx}
