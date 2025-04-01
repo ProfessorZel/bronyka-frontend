@@ -98,18 +98,16 @@ function ReservationListItem(reservation: Reservation) {
 
   async function handleDeleteReservation() {
     try {
-      const id = reservation.id;
+      const reservationId = reservation.id;
+      if (!reservationId) return;
 
-      if (!id) return;
-      const res = await api.delete<Reservation>(
-        `${RESERVATIONS_API}/${reservation.id}`,
-      );
-
-      const reservationData = res.data;
-
-      await mutateSwrReservationCache(reservationData);
+      await api.delete<Reservation>(`${RESERVATIONS_API}/${reservationId}`);
     } catch (e) {
       console.log(e);
+    } finally {
+      await mutate(() => true, undefined, {
+        revalidate: false,
+      });
     }
   }
 }
@@ -224,12 +222,4 @@ function transformReservationsToCollapseItems(
     children: <ReservationListItem {...reservation} />,
     showArrow: true,
   }));
-}
-
-async function mutateSwrReservationCache(reserv?: Reservation) {
-  if (!reserv) return;
-
-  await mutate(() => true, undefined, {
-    revalidate: false,
-  });
 }
