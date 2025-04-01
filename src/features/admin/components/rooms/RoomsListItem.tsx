@@ -1,12 +1,12 @@
-import { useApi } from "@/app/shared/api/useApi";
-import { MEETING_ROOMS_API } from "@/app/shared/constants";
-import { userConfirmAction } from "@/app/shared/utils";
-import { MeetingRoom } from "@/features/meeting_rooms/types";
-import { Button, List } from "antd";
-import { IoCalendar } from "react-icons/io5";
-import { MdDelete } from "react-icons/md";
-import { useNavigate } from "react-router";
-import { mutate } from "swr";
+import { useApi } from '@/app/shared/api/useApi';
+import { MEETING_ROOMS_API } from '@/app/shared/constants';
+import { userConfirmAction } from '@/app/shared/utils';
+import { MeetingRoom } from '@/features/meeting_rooms/types';
+import { Button, List } from 'antd';
+import { IoCalendar } from 'react-icons/io5';
+import { MdDelete, MdEdit } from 'react-icons/md';
+import { useNavigate } from 'react-router';
+import { mutate } from 'swr';
 
 export function RoomsListItem({ id, description, name }: MeetingRoom) {
   const nav = useNavigate();
@@ -30,12 +30,12 @@ export function RoomsListItem({ id, description, name }: MeetingRoom) {
           shape="circle"
           title="Удалить"
         />
-        {/* <Button
+        <Button
           icon={<MdEdit />}
           onClick={() => nav(`edit/${id}`)}
           shape="circle"
           title="Редактировать"
-        /> */}
+        />
         <Button
           icon={<IoCalendar />}
           onClick={() => nav(`reservations/${id}`)}
@@ -55,7 +55,7 @@ export function RoomsListItem({ id, description, name }: MeetingRoom) {
       if (!confirm) return;
 
       const response = await api.delete<MeetingRoom>(
-        `${MEETING_ROOMS_API}/${id}`
+        `${MEETING_ROOMS_API}/${id}`,
       );
       mutateSwrRoomsCache(response.data);
     } catch (e) {
@@ -76,6 +76,6 @@ async function mutateSwrRoomsCache(room?: MeetingRoom) {
     },
     {
       revalidate: false,
-    }
+    },
   );
 }

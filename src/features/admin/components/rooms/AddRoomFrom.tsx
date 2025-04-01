@@ -1,21 +1,21 @@
-import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
-import { useApi } from "@/app/shared/api/useApi";
-import { MEETING_ROOMS_API } from "@/app/shared/constants";
-import { useNotifications } from "@/app/shared/hooks/useNotifications";
-import { MeetingRoom } from "@/features/meeting_rooms/types";
-import { Button, Drawer, Form, Input } from "antd";
-import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { mutate } from "swr";
-import { useRoom } from "../../hooks/useRoom";
-import { isFormValid } from "../../utils";
+import { ResponseApiUnprocessableEntity } from '@/app/shared/api/types';
+import { useApi } from '@/app/shared/api/useApi';
+import { MEETING_ROOMS_API } from '@/app/shared/constants';
+import { useNotifications } from '@/app/shared/hooks/useNotifications';
+import { MeetingRoom } from '@/features/meeting_rooms/types';
+import { Button, Drawer, Form, Input } from 'antd';
+import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { mutate } from 'swr';
+import { useRoom } from '../../hooks/useRoom';
+import { isFormValid } from '../../utils';
 
-type AddRoomFormData = Omit<MeetingRoom, "id">;
+type AddRoomFormData = Omit<MeetingRoom, 'id'>;
 
 const defaultAddRoomFormData: AddRoomFormData = {
-  name: "",
-  description: "",
+  name: '',
+  description: '',
 };
 
 export function AddRoomFrom() {
@@ -27,7 +27,7 @@ export function AddRoomFrom() {
   const initFormData = useRoom(roomId);
 
   const [formData, setFormData] = useState<AddRoomFormData>(
-    defaultAddRoomFormData
+    defaultAddRoomFormData,
   );
 
   useEffect(() => {
@@ -40,22 +40,22 @@ export function AddRoomFrom() {
 
   const isEditMode = !!roomId;
   const title = isEditMode
-    ? "Редактировать рабочее место"
-    : "Создать новое рабочее место";
+    ? 'Редактировать рабочее место'
+    : 'Создать новое рабочее место';
 
   return (
-    <Drawer title={title} size="large" onClose={() => nav("/admin/rooms")} open>
+    <Drawer title={title} size="large" onClose={() => nav('/admin/rooms')} open>
       <Form labelWrap onSubmitCapture={handleCreateRoom} labelCol={{ span: 3 }}>
         <Form.Item label="Наизвание">
           <Input
-            onChange={handleInputChange("name")}
+            onChange={handleInputChange('name')}
             value={formData.name}
             type="text"
           />
         </Form.Item>
         <Form.Item label="Описание">
           <Input
-            onChange={handleInputChange("description")}
+            onChange={handleInputChange('description')}
             value={formData.description}
             type="text"
           />
@@ -66,7 +66,7 @@ export function AddRoomFrom() {
           htmlType="submit"
           type="primary"
         >
-          {isEditMode ? "Сохранить" : "Создать"}
+          {isEditMode ? 'Сохранить' : 'Создать'}
         </Button>
       </Form>
       {ctx}
@@ -80,13 +80,13 @@ export function AddRoomFrom() {
           ? await post<MeetingRoom>(`${MEETING_ROOMS_API}/`, formData)
           : await patch<MeetingRoom>(
               `${MEETING_ROOMS_API}/${roomId}`,
-              formData
+              formData,
             );
 
       const roomData = res.data;
 
       mutateSwrRoomsCache(roomData, !isEditMode && isFormValid(formData));
-      nav("/admin/rooms");
+      nav('/admin/rooms');
     } catch (e) {
       const err = e as AxiosError;
 
@@ -95,13 +95,13 @@ export function AddRoomFrom() {
           data: ResponseApiUnprocessableEntity;
         };
         const errorMessages = errHasData.data.detail.flatMap(({ msg }) =>
-          msg ? [msg] : []
+          msg ? [msg] : [],
         );
 
-        send("error", errorMessages);
+        send('error', errorMessages);
       } else {
-        send("error", ["An unexpected error occurred"]);
-        console.error("Reservation error:", err);
+        send('error', ['An unexpected error occurred']);
+        console.error('Reservation error:', err);
       }
     }
   }
@@ -125,6 +125,6 @@ async function mutateSwrRoomsCache(room?: MeetingRoom, create: boolean = true) {
     },
     {
       revalidate: false,
-    }
+    },
   );
 }
