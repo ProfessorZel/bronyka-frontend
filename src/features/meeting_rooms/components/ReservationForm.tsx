@@ -49,26 +49,30 @@ export function ReservationForm() {
   return (
     <div className="flex flex-col gap-6">
       <Card title={formTitle}>
-        <Form onSubmitCapture={handleReservation}>
-          <Form.Item>
-            <div className="flex flex-col gap-6">
-              <DatePicker
-                showTime
-                value={dayjs(reservationForm.from)}
-                onChange={(_: Dayjs, dateStr: string | string[]) => {
-                  const newDT = new Date(dateStr as string);
-                  set({ from: newDT });
-                }}
-              />
-              <DatePicker
-                showTime
-                value={dayjs(reservationForm.to)}
-                onChange={(_: Dayjs, dateStr: string | string[]) => {
-                  const newDT = new Date(dateStr as string);
-                  set({ to: newDT });
-                }}
-              />
-            </div>
+        <Form
+          labelCol={{ span: 4 }}
+          layout="vertical"
+          onSubmitCapture={handleReservation}
+        >
+          <Form.Item label="Начало бронирования">
+            <DatePicker
+              showTime
+              value={dayjs(reservationForm.from)}
+              onChange={(_: Dayjs, dateStr: string | string[]) => {
+                const newDT = new Date(dateStr as string);
+                set({ from: newDT });
+              }}
+            />
+          </Form.Item>
+          <Form.Item label="Окончание бронирования">
+            <DatePicker
+              showTime
+              value={dayjs(reservationForm.to)}
+              onChange={(_: Dayjs, dateStr: string | string[]) => {
+                const newDT = new Date(dateStr as string);
+                set({ to: newDT });
+              }}
+            />
           </Form.Item>
           <Button shape="round" type="primary" htmlType="submit">
             Заявка на бронирование
