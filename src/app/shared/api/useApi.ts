@@ -1,18 +1,24 @@
-import { useSessionToken } from "@/features/auth";
+import { useSessionToken } from '@/features/auth';
 import axios, {
   AxiosError,
   AxiosResponse,
   RawAxiosRequestHeaders,
-} from "axios";
-import { ApiResponse, RequestConfig } from "./types";
+} from 'axios';
+import { ApiResponse, RequestConfig } from './types';
 
-const baseUrl = import.meta.env.VITE_BASE_URL;
+export const BASE_URL = getBaseURL();
+export const baseUrl = `${BASE_URL}/`.replaceAll('//', '/');
+
+function getBaseURL() {
+  const base = document.querySelector('head > base');
+  return base ? new URL(base.getAttribute('href')!).pathname : '/';
+}
 
 const apiClient = axios.create({
   baseURL: baseUrl,
   timeout: 10000,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
@@ -21,7 +27,7 @@ export function useApi() {
 
   const defaultHeaders: RawAxiosRequestHeaders = {
     Authorization: token ? `Bearer ${token}` : undefined,
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   };
 
   function handleResponse<T>(response: AxiosResponse<T>): ApiResponse<T> {
@@ -55,7 +61,7 @@ export function useApi() {
 
   function get<T>(
     key: string,
-    config: RequestConfig = { headers: defaultHeaders }
+    config: RequestConfig = { headers: defaultHeaders },
   ) {
     return apiClient
       .get<T>(getUrl(key), config)
@@ -68,7 +74,7 @@ export function useApi() {
   function post<T>(
     key: string,
     payload: any,
-    config: RequestConfig = { headers: defaultHeaders }
+    config: RequestConfig = { headers: defaultHeaders },
   ) {
     return apiClient
       .post<T>(getUrl(key), payload, config)
@@ -81,7 +87,7 @@ export function useApi() {
   function patch<T>(
     key: string,
     payload: any,
-    config: RequestConfig = { headers: defaultHeaders }
+    config: RequestConfig = { headers: defaultHeaders },
   ) {
     return apiClient
       .patch<T>(getUrl(key), payload, config)
@@ -93,7 +99,7 @@ export function useApi() {
 
   function _delete<T>(
     key: string,
-    config: RequestConfig = { headers: defaultHeaders }
+    config: RequestConfig = { headers: defaultHeaders },
   ) {
     return axios
       .delete(getUrl(key), config)
