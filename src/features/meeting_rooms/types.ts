@@ -1,3 +1,5 @@
+import { User } from '../admin/types';
+
 export interface MeetingRoom {
   name: string;
   description: string;
@@ -10,6 +12,8 @@ export interface Reservation {
   id: number;
   meetingroom_id: number;
   user_id: number;
+  meetingroom: MeetingRoom;
+  user: User;
 }
 
 export interface BigCalendarEvent {
