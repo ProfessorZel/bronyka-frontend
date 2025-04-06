@@ -21,7 +21,7 @@ export function Authenticator({ children }: AuthenticatorProps) {
   const isAppReady = isAuth && !!session.user;
 
   useEffect(() => {
-    const savedSession = sessionStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
+    const savedSession = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
     if (savedSession) setSession({ accessToken: savedSession, user: null });
   }, []);
 
@@ -40,12 +40,12 @@ export function Authenticator({ children }: AuthenticatorProps) {
   );
 
   function saveSessionToken(accessToken: string) {
-    sessionStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, accessToken);
+    localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, accessToken);
     setSession({ accessToken, user: null });
   }
 
   function sessionReset() {
-    sessionStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+    localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
     setSession(null);
   }
 
