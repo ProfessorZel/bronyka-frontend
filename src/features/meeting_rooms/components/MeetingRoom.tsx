@@ -1,6 +1,7 @@
+import { reservationForBigCalendarDTO } from '@/app/shared/utils';
+import { BigCalendarReservations } from '../../../app/shared/BigCalendarReservations';
 import { useMeetingRoomReservation } from '../hooks/useMeetingRoomReservation';
-import { reservationToCalendarEvents } from '../utils/transform';
-import { BigCalendarReservations } from './BigCalendarReservations';
+
 import { ReservationForm } from './ReservationForm';
 
 const listStyles = {
@@ -19,7 +20,7 @@ export function MeetingRoom() {
     >
       <ReservationForm />
       <BigCalendarReservations
-        events={reservation ? reservationToCalendarEvents(reservation) : []}
+        events={reservation ? reservationForBigCalendarDTO(reservation) : []}
       />
     </div>
   );

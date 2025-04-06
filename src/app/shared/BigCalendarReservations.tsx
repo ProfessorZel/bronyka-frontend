@@ -1,9 +1,17 @@
+import { Reservation } from '@/features/meeting_rooms/types';
 import { Button, Select } from 'antd';
 import { useState } from 'react';
 import { Calendar, View, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
-import { calendarConfig } from '../calendarConfig';
-import { BigCalendarEvent } from '../types';
+import { calendarConfig } from '../../features/meeting_rooms/calendarConfig';
+
+export interface BigCalendarEvent {
+  title: string;
+  start: Date;
+  end: Date;
+  allDay?: boolean;
+  resource?: Partial<Reservation>;
+}
 
 interface BigCalendarReservationsProps {
   events: BigCalendarEvent[];

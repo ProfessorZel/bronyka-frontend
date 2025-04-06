@@ -15,11 +15,3 @@ export interface Reservation {
   meetingroom: MeetingRoom;
   user: User;
 }
-
-export interface BigCalendarEvent {
-  title: string;
-  start: Date;
-  end: Date;
-  allDay?: boolean;
-  resource?: Partial<BigCalendarEvent>;
-}
