@@ -1,4 +1,4 @@
-import { OwnReservationsList } from "./components/OwnReservationsList";
+import { OwnReservationsList } from './components/OwnReservations';
 
 export function ProfileLayout() {
   return (
