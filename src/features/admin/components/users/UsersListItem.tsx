@@ -16,9 +16,9 @@ export function UsersListItem({ email, fio, id, is_superuser }: User) {
       style={{ padding: 10 }}
       className="flex flex-row justify-start items-center hover:border-none hover:bg-gray-100 duration-200"
     >
-      <div className="grid grid-flow-col grid-cols-[50px_1fr_100px_1fr] w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         <span>{id}</span>
-        <span> {fio}</span>
+        <span className="truncate">{fio}</span>
         <span>{!is_superuser || 'admin'}</span>
         <span>{email}</span>
       </div>

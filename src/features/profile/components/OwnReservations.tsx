@@ -7,12 +7,11 @@ import {
   userConfirmAction,
 } from '@/app/shared/utils';
 import { Reservation } from '@/features/meeting_rooms/types';
-import { Button, FloatButton, List, Switch } from 'antd';
+import { Button, List, Switch } from 'antd';
 import { useState } from 'react';
 import { MdDelete } from 'react-icons/md';
 import { mutate } from 'swr';
 import { useOwnReservations } from '../hooks/useOwnReservations';
-FloatButton;
 
 interface HistoryToggleProps {
   history: boolean;
@@ -68,7 +67,7 @@ function ListItemWithoutControls({
         className="w-full flex flex-row justify-between items-center"
         style={{ padding: 10 }}
       >
-        <div className="grid grid-rows-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
           <p className="font-semibold">
             <span className="font-extrabold">Рабочее место:</span>{' '}
             {meetingroom.name}
@@ -136,15 +135,21 @@ function ListHeader({
       <span className="font-semibold text-black">
         Мои заявки на бронирование
       </span>
-      <Switch checked={history} onChange={onHistoryChange} />
-      <span className={`font-bold ${history ? 'text-blue-500' : 'text-black'}`}>
-        История
-      </span>
 
-      <Switch checked={view} onChange={onViewChange} />
-      <span className={`font-bold ${view ? 'text-blue-500' : 'text-black'}`}>
-        Календарь
-      </span>
+      <div className="flex gap-2 flex-wrap">
+        <Switch checked={history} onChange={onHistoryChange} />
+        <span
+          className={`font-bold ${history ? 'text-blue-500' : 'text-black'}`}
+        >
+          История
+        </span>
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        <Switch checked={view} onChange={onViewChange} />
+        <span className={`font-bold ${view ? 'text-blue-500' : 'text-black'}`}>
+          Календарь
+        </span>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { NavBar } from './components/NavBar';
 export function AdminLayout() {
   return (
     <div
-      className="h-full w-full flex flex-row flex-wrap gap-10 overflow-scroll"
+      className="h-full w-full flex flex-row flex-wrap gap-10 overflow-auto"
       style={{ padding: 10 }}
     >
       <NavBar />

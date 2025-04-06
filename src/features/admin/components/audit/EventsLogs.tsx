@@ -44,10 +44,7 @@ export function EventsLogs() {
         />
       </div>
 
-      <div
-        className="w-full h-auto overflow-y-auto"
-        style={{ paddingBottom: 100 }}
-      >
+      <div className="w-full h-auto overflow-y-auto">
         <List
           className="bg-white rounded-md"
           style={{ padding: 10 }}

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -30,7 +30,8 @@ html {
 }
 
 body {
-  overflow: hidden;
+  background-color: #eff6ff;
+  overflow: auto;
   height: 100%;
   width: 100%;
   overscroll-behavior: contain;

@@ -29,7 +29,7 @@ export function NavBar() {
 
   return (
     <Menu
-      className="rounded-md bg-white h-full"
+      className="rounded-md bg-white h-full w-full"
       onClick={handleClickMenu}
       items={navMenuItems}
     />
