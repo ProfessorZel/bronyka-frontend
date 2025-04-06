@@ -32,7 +32,7 @@ export function EventsLogs() {
           size="middle"
           onClick={handleOldEventsLogs}
         >
-          Удалить статрыве события
+          Удалить старые события
         </Button>
         <Input
           type="number"
