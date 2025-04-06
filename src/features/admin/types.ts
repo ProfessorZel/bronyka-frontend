@@ -8,3 +8,10 @@ export interface User {
   birthdate: string;
   password: string;
 }
+
+export interface EventLog {
+  time: string;
+  description: string;
+  user_id: number;
+  user: User;
+}

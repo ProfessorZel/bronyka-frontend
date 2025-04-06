@@ -5,7 +5,7 @@ import {
   AdminReservationList,
   AdminRoomsList,
   AdminUsersList,
-  SystemLogs,
+  EventsLogs,
 } from '@/features/admin';
 import { Accessor, Authenticator } from '@/features/auth';
 import {
@@ -35,7 +35,7 @@ function AdminRoutes() {
             <Route path="new" element={<AdminAddUserForm />} />
             <Route path="edit/:userId" element={<AdminAddUserForm />} />
           </Route>
-          <Route path="audit" element={<SystemLogs />} />
+          <Route path="audit" element={<EventsLogs />} />
           <Route path="rooms" element={<AdminRoomsList />}>
             <Route path="new" element={<AdminAddRoomFrom />} />
             <Route path="edit/:roomId" element={<AdminAddRoomFrom />} />

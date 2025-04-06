@@ -1,8 +1,8 @@
-import { useApi } from "@/app/shared/api/useApi";
-import { LOCAL_STORAGE_TOKEN_KEY, USERS_API } from "@/app/shared/constants";
-import React, { useEffect, useState } from "react";
-import { Login } from "./components/Login";
-import { Session, User } from "./types";
+import { useApi } from '@/app/shared/api/useApi';
+import { LOCAL_STORAGE_TOKEN_KEY, USERS_API } from '@/app/shared/constants';
+import React, { useEffect, useState } from 'react';
+import { Login } from './components/Login';
+import { Session, User } from './types';
 
 interface AuthenticatorProps {
   children?: React.ReactNode;
@@ -23,7 +23,7 @@ export function Authenticator({ children }: AuthenticatorProps) {
   useEffect(() => {
     const savedSession = sessionStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
     if (savedSession) setSession({ accessToken: savedSession, user: null });
-  }, []);
+  }, [isAuth]);
 
   useEffect(() => {
     if (session?.accessToken) getUserSessionData();
@@ -57,7 +57,7 @@ export function Authenticator({ children }: AuthenticatorProps) {
 
       const res: User = await api.get(`${USERS_API}/me`, {
         headers: {
-          Authorization: "Bearer " + accessToken,
+          Authorization: 'Bearer ' + accessToken,
         },
       });
 

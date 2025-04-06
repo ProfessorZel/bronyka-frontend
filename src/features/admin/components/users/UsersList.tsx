@@ -9,7 +9,7 @@ export function UsersList() {
   const users = useUsersList();
 
   return (
-    <div className="w-full h-full flex flex-col gap-2">
+    <div className="w-full h-full flex flex-col gap-2 overflow-auto">
       <Button
         shape="round"
         icon={<IoIosAddCircleOutline />}
