@@ -1,6 +1,6 @@
-import { notification } from "antd";
+import { notification } from 'antd';
 
-type NotificationType = "success" | "error";
+export type NotificationType = 'success' | 'error';
 
 export function useNotifications() {
   const [notificationApi, ctx] = notification.useNotification();

@@ -1,6 +1,11 @@
+import { ResponseApiUnprocessableEntity } from '@/app/shared/api/types';
 import { useApi } from '@/app/shared/api/useApi';
 import { BigCalendarReservations } from '@/app/shared/BigCalendarReservations';
 import { RESERVATIONS_API } from '@/app/shared/constants';
+import {
+  NotificationType,
+  useNotifications,
+} from '@/app/shared/hooks/useNotifications';
 import {
   dateTimeFormatter,
   reservationForBigCalendarDTO,
@@ -8,6 +13,7 @@ import {
 } from '@/app/shared/utils';
 import { Reservation } from '@/features/meeting_rooms/types';
 import { Button, List, Switch } from 'antd';
+import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { MdDelete } from 'react-icons/md';
 import { mutate } from 'swr';
@@ -20,11 +26,16 @@ interface HistoryToggleProps {
   onViewChange: (checked: boolean) => void;
 }
 
+type ListItemProps = Reservation & {
+  send: (type: NotificationType, messages: string[]) => void;
+};
+
 const df = dateTimeFormatter;
 
 export function OwnReservationsList() {
   const [history, setHistory] = useState<boolean>(false);
   const [viewCalendar, setViewCalendar] = useState<boolean>(false);
+  const { send, ctx } = useNotifications();
 
   const reservations = useOwnReservations(history);
 
@@ -45,10 +56,11 @@ export function OwnReservationsList() {
           <List
             className="w-full bg-white"
             bordered
-            dataSource={reservations}
+            dataSource={reservations.map((item) => ({ ...item, send }))}
             renderItem={history ? ListItemWithoutControls : ListItem}
           />
         )}
+        {ctx}
       </div>
     </div>
   );
@@ -58,7 +70,7 @@ function ListItemWithoutControls({
   from_reserve,
   to_reserve,
   meetingroom,
-}: Reservation) {
+}: ListItemProps) {
   const datetime = `${df(from_reserve)} - ${df(to_reserve)}`;
 
   return (
@@ -81,7 +93,13 @@ function ListItemWithoutControls({
   );
 }
 
-function ListItem({ from_reserve, to_reserve, meetingroom, id }: Reservation) {
+function ListItem({
+  from_reserve,
+  to_reserve,
+  meetingroom,
+  id,
+  send,
+}: ListItemProps) {
   const datetime = `${df(from_reserve)} - ${df(to_reserve)}`;
   const api = useApi();
 
@@ -116,8 +134,29 @@ function ListItem({ from_reserve, to_reserve, meetingroom, id }: Reservation) {
       const confirm = userConfirmAction(`Удалить заявку на бронирование`);
       if (!confirm) return;
       await api.delete(`${RESERVATIONS_API}/${id}`);
+      send('success', ['Заявка на бронирование успешно удалена!']);
     } catch (e) {
-      console.log(e);
+      const err = e as AxiosError;
+
+      if (err.status === 422) {
+        const errHasData = err as AxiosError & {
+          data: ResponseApiUnprocessableEntity;
+        };
+
+        if (Array.isArray(errHasData.data.detail)) {
+          const errorMessages = errHasData.data.detail
+            .flatMap(({ msg }) => (msg ? [msg] : []))
+            .filter(Boolean);
+
+          send('error', errorMessages);
+        }
+
+        if (typeof errHasData.data.detail === 'string') {
+          send('error', [errHasData.data.detail]);
+        }
+      } else {
+        send('error', ['Произошла непредвиденная ошибка']);
+      }
     } finally {
       await mutate(() => true, undefined, { revalidate: true });
     }
