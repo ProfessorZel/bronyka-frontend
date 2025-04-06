@@ -23,7 +23,7 @@ export function Authenticator({ children }: AuthenticatorProps) {
   useEffect(() => {
     const savedSession = sessionStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
     if (savedSession) setSession({ accessToken: savedSession, user: null });
-  }, [isAuth]);
+  }, []);
 
   useEffect(() => {
     if (session?.accessToken) getUserSessionData();
