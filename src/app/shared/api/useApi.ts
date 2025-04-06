@@ -6,8 +6,7 @@ import axios, {
 } from 'axios';
 import { ApiResponse, RequestConfig } from './types';
 
-export const BASE_URL = getBaseURL();
-export const baseUrl = `${BASE_URL}/`.replaceAll('//', '/');
+export const baseUrl = `${getBaseURL()}/`.replaceAll('//', '/');
 
 function getBaseURL() {
   const base = document.querySelector('head > base');
