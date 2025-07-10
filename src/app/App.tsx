@@ -1,9 +1,11 @@
 import {
   AdminAddRoomFrom,
   AdminAddUserForm,
+  AdminAddGroupForm,
   AdminLayout,
   AdminReservationList,
   AdminRoomsList,
+  AdminGroupsList,
   AdminUsersList,
   EventsLogs,
 } from '@/features/admin';
@@ -19,6 +21,7 @@ import { Navigate, Route, Routes } from 'react-router';
 import { SWRConfig, SWRConfiguration } from 'swr';
 import { AppLayout } from './AppLayout';
 import { useApi } from './shared/api/useApi';
+import '@ant-design/v5-patch-for-react-19';
 
 interface ProviderProps {
   children?: React.ReactNode;
@@ -43,6 +46,10 @@ function AdminRoutes() {
               path="reservations/:roomId"
               element={<AdminReservationList />}
             />
+          </Route>
+          <Route path="groups" element={<AdminGroupsList />}>
+            <Route path="new" element={<AdminAddGroupForm />} />{/*сделать создание группы*/}
+            <Route path="edit/:groupId" element={<AdminAddGroupForm />} />{/*сделать добовление в группу*/}
           </Route>
         </Route>
       </Routes>

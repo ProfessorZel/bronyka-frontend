@@ -8,14 +8,14 @@ export default defineConfig({
   server: {
     proxy: {
       "/auth": {
-        target: "http://localhost:8000",
+        target: "http://localhost",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
-      "/api": "http://localhost:8000",
+      "/api": "http://localhost",
       "/users": {
-        target: "http://localhost:8000",
+        target: "http://localhost",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),

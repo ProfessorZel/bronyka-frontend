@@ -10,12 +10,15 @@ import { useNavigate, useParams } from 'react-router';
 import { mutate } from 'swr';
 import { useRoom } from '../../hooks/useRoom';
 import { isFormValid } from '../../utils';
+// import FormItem from 'antd/es/form/FormItem';
+// import { stringify } from 'querystring';
 
 type AddRoomFormData = Omit<MeetingRoom, 'id'>;
 
 const defaultAddRoomFormData: AddRoomFormData = {
   name: '',
   description: '',
+//   imageURL: '',
 };
 
 export function AddRoomFrom() {
@@ -29,6 +32,7 @@ export function AddRoomFrom() {
   const [formData, setFormData] = useState<AddRoomFormData>(
     defaultAddRoomFormData,
   );
+//   const [imageURL, setImageURL] = useState('');
 
   useEffect(() => {
     if (initFormData) setFormData({ ...initFormData });
@@ -46,7 +50,7 @@ export function AddRoomFrom() {
   return (
     <Drawer title={title} size="large" onClose={() => nav('/admin/rooms')} open>
       <Form labelWrap onSubmitCapture={handleCreateRoom} labelCol={{ span: 3 }}>
-        <Form.Item label="Наизвание">
+        <Form.Item label="Название">
           <Input
             onChange={handleInputChange('name')}
             value={formData.name}
@@ -56,12 +60,19 @@ export function AddRoomFrom() {
         <Form.Item label="Описание">
           <Input
             onChange={handleInputChange('description')}
-            value={formData.description}
+            value={formData.description.split(';')[0]} //formData.description
             type="text"
           />
         </Form.Item>
+        {/* <FormItem label="imageURL">
+            <Input
+               onChange={handleInputChangeForImageURL()}
+               value={formData.description.split(';')[1]}
+               type="text"
+            />
+        </FormItem> */}
         <Button
-          disabled={!isEditMode ? !isFormValid(formData) : false}
+          disabled={!isEditMode ? !(isFormValid(formData)/* && imageURL*/) : false}
           shape="round"
           htmlType="submit"
           type="primary"
@@ -74,6 +85,8 @@ export function AddRoomFrom() {
   );
 
   async function handleCreateRoom() {
+   // formData.description = imageURL ? formData.description + `;${imageURL}`: formData.description;
+   
     try {
       const res =
         !isEditMode && isFormValid(formData)
@@ -111,6 +124,12 @@ export function AddRoomFrom() {
       set({ [key]: e.target.value });
     };
   }
+
+//   function handleInputChangeForImageURL() {
+//     return function (e: React.ChangeEvent<HTMLInputElement>) {
+//       setImageURL(e.target.value);
+//     };
+//   }
 }
 
 async function mutateSwrRoomsCache(room?: MeetingRoom, create: boolean = true) {

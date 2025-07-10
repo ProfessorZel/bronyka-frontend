@@ -4,6 +4,7 @@ import { CgProfile } from 'react-icons/cg';
 import { IoHomeSharp } from 'react-icons/io5';
 import { MdAdminPanelSettings } from 'react-icons/md';
 import { NavLink, useLocation, useNavigate } from 'react-router';
+import { LOCAL_STORAGE_TOKEN_KEY } from '@/app/shared/constants';
 
 export function Header() {
   const nav = useNavigate();
@@ -16,6 +17,10 @@ export function Header() {
 
   const handleAdminPanel = () => nav('/admin/users');
   const handleUserProfile = () => nav('/profile');
+  const handleUserLogOut = () => {
+   localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+   location.reload();
+  };
 
   const adminPanelNavLink = isAdmin ? (
     <Button
@@ -51,6 +56,13 @@ export function Header() {
           icon={<CgProfile />}
           className="self-center"
         />
+        <Button
+            onClick={handleUserLogOut}
+            type="primary"
+            size="large"
+            // icon={<CgProfile />}
+            className="self-center"
+         >Выйти</Button>
       </div>
     </div>
   );

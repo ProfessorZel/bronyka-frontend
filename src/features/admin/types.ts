@@ -15,3 +15,21 @@ export interface EventLog {
   user_id: number;
   user: User;
 }
+
+export interface Group {
+  name: string;
+  adGroupDN: string;
+  id: number;
+}
+
+export interface permissionsType {
+   max_future_reservation: string;
+   meetingroom_id: number;
+}
+
+export interface GroupRooms {
+   name: string;
+   adGroupDN: string;
+   id: number;
+   permissions: permissionsType[];
+}
