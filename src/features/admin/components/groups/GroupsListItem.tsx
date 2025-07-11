@@ -3,20 +3,20 @@ import { GROUPS_API } from '@/app/shared/constants';
 import { userConfirmAction } from '@/app/shared/utils';
 import { Group } from '../../types';
 import { Button, List } from 'antd';
-import { MouseEventHandler } from 'react';
+import { useEffect, useState } from 'react';
 import { MdKeyboardArrowDown, MdDelete } from 'react-icons/md';
 import { GroupRooms } from './GroupRooms';
 import { mutate } from 'swr';
+import { useLocation } from 'react-router';
 
-type GroupWithHandel = {
-   id: number;
-   name: string;
-   IsView: boolean;
-   handelChangeIsView: MouseEventHandler;
-}
-
-export function GroupListItem({ id, name, IsView, handelChangeIsView }: GroupWithHandel) {
+export function GroupListItem({ id, name}: Group) {
    const api = useApi();
+   const [ isView, setIsView ] = useState(false);
+   let location = useLocation();
+
+   useEffect(() => {
+      setIsView(false);
+   }, [location.pathname]);
 
    return (
       <List.Item
@@ -27,7 +27,7 @@ export function GroupListItem({ id, name, IsView, handelChangeIsView }: GroupWit
             <div
                style={{ padding: 10 }}
                className='w-[100%] flex flex-row justify-between hover:border-none hover:bg-gray-100 duration-200'
-               onClick={handelChangeIsView}
+               onClick={() => {setIsView(!isView);}}
             >
                <div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                   <span>{name}</span>
@@ -35,7 +35,7 @@ export function GroupListItem({ id, name, IsView, handelChangeIsView }: GroupWit
                </div>
                <div className="flex flex-row gap-5">
                   <Button
-                     onClick={handelChangeIsView}
+                     onClick={() => {setIsView(!isView);}}
                      icon={<MdKeyboardArrowDown />}
                      shape="circle"
                      title="Показать группу"
@@ -48,7 +48,7 @@ export function GroupListItem({ id, name, IsView, handelChangeIsView }: GroupWit
                   />
                </div>
             </div>
-            {IsView ? <GroupRooms groupId={id}/>: null}
+            {isView ? <GroupRooms groupId={id}/>: null}
          </div>
       </List.Item>
    );

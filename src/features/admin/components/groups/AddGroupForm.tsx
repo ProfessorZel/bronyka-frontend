@@ -4,7 +4,7 @@ import { GROUPS_API } from '@/app/shared/constants';
 import { useNotifications } from '@/app/shared/hooks/useNotifications';
 import { Button, Drawer, Form, Input, List, Typography } from 'antd';
 import { AxiosError } from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import useSWR, { mutate } from 'swr';
 import { isFormValid } from '../../utils';
@@ -77,7 +77,7 @@ export function AddGroupForm() {
       }
    }
 
-   let initFreedomRooms: AddFreedomRooms = defaultFreedomRooms;
+   let initFreedomRoomsRaw: AddFreedomRooms = defaultFreedomRooms;
    let arrayFreedom: permissionsType[] = [];
    if (freedomRoomsId) {
       freedomRoomsId.forEach(e => {
@@ -88,10 +88,14 @@ export function AddGroupForm() {
          arrayFreedom.push(initData);
       });
    }
-   initFreedomRooms.permissions=arrayFreedom;
+   initFreedomRoomsRaw.permissions=arrayFreedom;
 
-   const initFormData = useGroup(groupId);//группа по id
-   const initFormDataPatch = dat ?? defaultAddRoomFormData;//группа по id
+   const initFreedomRooms = useMemo(() => initFreedomRoomsRaw, [initFreedomRoomsRaw?.permissions]);
+
+   const initFormDataRaw = useGroup(groupId);
+   const initFormData = useMemo(() => initFormDataRaw, [initFormDataRaw?.id]);//группа по id
+   const initFormDataPatchRaw = dat ?? defaultAddRoomFormData;//группа по id
+   const initFormDataPatch = useMemo(() => initFormDataPatchRaw, [initFormDataPatchRaw?.name]);
 
    const [freedomRooms, setFreedomRooms] = useState<AddFreedomRooms>(
       defaultFreedomRooms,
@@ -123,6 +127,7 @@ export function AddGroupForm() {
       if (initFreedomRooms) {
          setFreedomRooms({ ...initFreedomRooms })
       }
+      console.log(initFreedomRooms);
    }, [initFreedomRooms]);
 
    const set = (attrs: Partial<AddGroupFormData>) => {
