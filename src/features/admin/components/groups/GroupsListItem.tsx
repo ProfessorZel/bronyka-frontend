@@ -3,14 +3,20 @@ import { GROUPS_API } from '@/app/shared/constants';
 import { userConfirmAction } from '@/app/shared/utils';
 import { Group } from '../../types';
 import { Button, List } from 'antd';
-import { useState } from 'react';
+import { MouseEventHandler } from 'react';
 import { MdKeyboardArrowDown, MdDelete } from 'react-icons/md';
 import { GroupRooms } from './GroupRooms';
 import { mutate } from 'swr';
 
-export function GroupListItem({ id, name }: Group) {
+type GroupWithHandel = {
+   id: number;
+   name: string;
+   IsView: boolean;
+   handelChangeIsView: MouseEventHandler;
+}
+
+export function GroupListItem({ id, name, IsView, handelChangeIsView }: GroupWithHandel) {
    const api = useApi();
-   const [isView, setIsView] = useState(false);
 
    return (
       <List.Item
@@ -21,7 +27,7 @@ export function GroupListItem({ id, name }: Group) {
             <div
                style={{ padding: 10 }}
                className='w-[100%] flex flex-row justify-between hover:border-none hover:bg-gray-100 duration-200'
-               onClick={() => {setIsView(!isView);}}
+               onClick={handelChangeIsView}
             >
                <div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                   <span>{name}</span>
@@ -29,7 +35,7 @@ export function GroupListItem({ id, name }: Group) {
                </div>
                <div className="flex flex-row gap-5">
                   <Button
-                     onClick={() => {setIsView(!isView);}}
+                     onClick={handelChangeIsView}
                      icon={<MdKeyboardArrowDown />}
                      shape="circle"
                      title="Показать группу"
@@ -42,7 +48,7 @@ export function GroupListItem({ id, name }: Group) {
                   />
                </div>
             </div>
-            {isView ? <GroupRooms groupId={id}/>: null}
+            {IsView ? <GroupRooms groupId={id}/>: null}
          </div>
       </List.Item>
    );

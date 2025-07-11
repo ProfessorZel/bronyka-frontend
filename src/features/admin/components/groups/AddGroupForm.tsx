@@ -108,14 +108,14 @@ export function AddGroupForm() {
    useEffect(() => {
       if (initFormData) setFormData({ ...initFormData });
    }, [initFormData]);
-
+   
    useEffect(() => {
       if (initFormDataPatch) {
          let initData: AddRoomFormData = defaultAddRoomFormData;
          initData.name = initFormDataPatch.name;
          initData.adGroupDN = initFormDataPatch.adGroupDN;
          initData.permissions = initFormDataPatch.permissions;
-         setFormDataPatch({ ...initData })
+         setFormDataPatch({ ...initData });
       };
    }, [initFormDataPatch]);
 
@@ -168,7 +168,7 @@ export function AddGroupForm() {
                            roomId={e.meetingroom_id}
                            inGroup={true}
                            icon={<IoIosRemoveCircleOutline />}
-                           inputValue={parseInt(e.max_future_reservation.split(' ')[0])}
+                           inputValue={parseInt(e.max_future_reservation.split(' ')[0])} // надо будет добавить доп inputs для формата 00:00:00
                            change={hendelRemoveRoom(e)}
                            reservChange={handlePermissionChange}
                         />}

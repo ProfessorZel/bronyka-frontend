@@ -23,7 +23,7 @@ export function GroupRooms({ groupId }: GroupId) {
          <Button
            shape="round"
            icon={<IoIosAddCircleOutline />}
-           className="w-50"
+           className="w-50 flex flex-row justify-center items-center"
            size="middle"
            type="primary"
            onClick={() => nav(`edit/${groupId}`)}
