@@ -93,6 +93,14 @@ export function ReservationForm() {
     </div>
   );
 
+   function dateCustomFormatting(date: Date): string {
+      const padStart = (value: number): string =>
+         value.toString().padStart(2, '0');
+      return(
+         `${padStart(date.getDate())}/${padStart(date.getMonth() + 1)}/${date.getFullYear()} ${padStart(date.getHours())}:${padStart(date.getMinutes())}`
+      );
+   } 
+
   async function handleReservation() {
     const { from, to } = reservationForm;
 
@@ -109,6 +117,8 @@ export function ReservationForm() {
 
     try {
       await api.post<Reservation>(RESERVATIONS_API, payload);
+
+      send('success', [`Компьютер '${formTitle.split(':').pop()?.trim()}' забронирован Вами.${'\n'}Начало брони: ${dateCustomFormatting(from)}${'\n'}Окончание брони: ${dateCustomFormatting(to)}`]);
     } catch (error) {
       const err = error as AxiosError;
 
