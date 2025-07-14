@@ -1,7 +1,7 @@
 import { Menu, MenuProps } from 'antd';
 import { FaLaptopCode } from 'react-icons/fa';
 import { FiUsers } from 'react-icons/fi';
-import { /*GoTools,*/ GoGraph } from 'react-icons/go';
+import { GoTools, GoGraph } from 'react-icons/go';
 import { useNavigate } from 'react-router';
 
 const navMenuItems = [
@@ -15,16 +15,16 @@ const navMenuItems = [
     key: '/admin/rooms',
     icon: <FaLaptopCode />,
   },
-//   {
-//     label: 'Аудит системы',
-//     key: '/admin/audit',
-//     icon: <GoTools />,
-//   },
   {
-    label: 'Группы',
-    key: '/admin/groups',
-    icon: <GoGraph />,
-  },
+     label: 'Группы',
+     key: '/admin/groups',
+     icon: <GoGraph />,
+   },
+   {
+     label: 'Аудит системы',
+     key: '/admin/audit',
+     icon: <GoTools />,
+   },
 ];
 
 export function NavBar() {
