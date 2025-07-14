@@ -1,3 +1,5 @@
+import { UserGroup } from "../auth/types";
+
 export interface User {
   id: number;
   email: string;
@@ -7,6 +9,7 @@ export interface User {
   fio: string;
   birthdate: string;
   password: string;
+  group: UserGroup;
 }
 
 export interface EventLog {

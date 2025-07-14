@@ -127,7 +127,6 @@ export function AddGroupForm() {
       if (initFreedomRooms) {
          setFreedomRooms({ ...initFreedomRooms })
       }
-      console.log(initFreedomRooms);
    }, [initFreedomRooms]);
 
    const set = (attrs: Partial<AddGroupFormData>) => {
@@ -153,7 +152,7 @@ export function AddGroupForm() {
                type="text"
             />
          </Form.Item>
-         <Form.Item label="Описание">
+         <Form.Item label="Группа AD">
             <Input
                onChange={!isEditMode? handleInputChange('adGroupDN'): handleInputChangePatch('adGroupDN')}
                value={!isEditMode? formData.adGroupDN: formDataPatch.adGroupDN}

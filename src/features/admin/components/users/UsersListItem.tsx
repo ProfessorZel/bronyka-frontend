@@ -7,7 +7,7 @@ import { MdDelete, MdEdit } from 'react-icons/md';
 import { useNavigate } from 'react-router';
 import { mutate } from 'swr';
 
-export function UsersListItem({ email, fio, id, is_superuser }: User) {
+export function UsersListItem({ email, fio, id, is_superuser, group }: User) {
   const nav = useNavigate();
   const api = useApi();
 
@@ -16,11 +16,12 @@ export function UsersListItem({ email, fio, id, is_superuser }: User) {
       style={{ padding: 10 }}
       className="flex flex-row justify-start items-center hover:border-none hover:bg-gray-100 duration-200"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full">
         <span>{id}</span>
         <span className="truncate">{fio}</span>
         <span>{!is_superuser || 'admin'}</span>
         <span>{email}</span>
+        <span>{group? group.name: 'Нет группы'}</span>
       </div>
 
       <div className="flex flex-row gap-5">

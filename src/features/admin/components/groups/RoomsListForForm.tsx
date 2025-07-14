@@ -1,6 +1,7 @@
 import { List, Button, Input } from "antd";
 import { ChangeEventHandler, MouseEventHandler, ReactNode } from "react";
 import { useMeetingRooms } from "@/features/meeting_rooms/hooks/useMeetingRooms";
+import { MeetingRoom } from "@/features/meeting_rooms/types";
 
 type Props = {
    roomId: number;
@@ -13,7 +14,8 @@ type Props = {
 
 export function RoomsListForForm({ roomId, inGroup, icon, inputValue, change, reservChange }: Props) {
    const rooms = useMeetingRooms();
-   const room = Object.values(rooms)[roomId-1];
+   let room: MeetingRoom | undefined;
+   Object.values(rooms).map(item => {if (item.id==roomId) room = item;});
 
    return(
       <div className="w-full h-full overflow-auto" style={{ padding: 5 }}>
@@ -22,8 +24,8 @@ export function RoomsListForForm({ roomId, inGroup, icon, inputValue, change, re
             className="flex flex-row justify-start items-center"
          >
             <div className="w-[100%] ant-col flex flex-col justify-between items-start gap-2">
-               <span>{room.name}</span>
-               {inGroup? 
+               {room? <span>{room.name}</span>: null}
+               {inGroup && room? 
                   <>
                      <span>Максимальное время резервирования(в днях):</span>
                      <Input

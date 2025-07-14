@@ -1,4 +1,5 @@
 import { AUTH_API } from "@/app/shared/constants";
+import { useNotifications } from "@/app/shared/hooks/useNotifications";
 import { Button, Card, Form, Input, Typography } from "antd";
 import axios, { AxiosError } from "axios";
 import { ChangeEvent, useState } from "react";
@@ -36,12 +37,20 @@ const useLoginForm = (initialData: LoginData) => {
 export function Login({ saveSession }: LoginProps) {
   const { form, updateField } = useLoginForm(DEFAULT_LOGIN_DATA);
   const [loading, setLoading] = useState(false);
+  const { send, ctx } = useNotifications();
 
   const handleLogin = async () => {
     const { username, password } = form;
 
     if (!username || !password) {
       console.error("Username and password are required");
+      if (!username && password) {
+         send('error', ['Заполните поле Логин!']);
+      } else if (!password && username) {
+         send('error', ['Заполните поле Пароль!']);
+      } else {
+         send('error', ['Заполните поля Логин и Пароль!']);
+      }
       return;
     }
 
@@ -62,6 +71,7 @@ export function Login({ saveSession }: LoginProps) {
       }
     } catch (error) {
       console.error("Login failed:", (error as AxiosError).message);
+      send('error', ['Неправильный логин или пароль!\nПроверьте введённые Вами данные!']);
     } finally {
       setLoading(false);
     }
@@ -71,31 +81,31 @@ export function Login({ saveSession }: LoginProps) {
     <div className="min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-xl shadow-lg">
         <Typography.Title level={2} className="text-center mb-8">
-          Welcome Back
+          Добро пожаловать
         </Typography.Title>
 
         <Form layout="vertical" onFinish={handleLogin}>
           <Form.Item
-            label="Username"
+            label="Логин"
             rules={[{ required: true, message: "Please enter your username" }]}
           >
             <Input
               value={form.username}
               onChange={updateField("username")}
-              placeholder="Enter your username"
+              placeholder="Введите логин"
               size="large"
               className="w-full"
             />
           </Form.Item>
 
           <Form.Item
-            label="Password"
+            label="Пароль"
             rules={[{ required: true, message: "Please enter your password" }]}
           >
             <Input.Password
               value={form.password}
               onChange={updateField("password")}
-              placeholder="Enter your password"
+              placeholder="Введите пароль"
               size="large"
               className="w-full"
             />
@@ -114,6 +124,7 @@ export function Login({ saveSession }: LoginProps) {
           </Form.Item>
         </Form>
       </Card>
+      {ctx}
     </div>
   );
 }

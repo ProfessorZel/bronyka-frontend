@@ -1,10 +1,12 @@
 import { List } from "antd";
 import { permissionsType } from "../../types";
 import { useMeetingRooms } from "@/features/meeting_rooms/hooks/useMeetingRooms";
+import { MeetingRoom } from "@/features/meeting_rooms/types";
 
 export function GroupRoomsList({meetingroom_id, max_future_reservation}: permissionsType) {
    const rooms = useMeetingRooms();
-   const room = Object.values(rooms)[meetingroom_id-1];
+   let room: MeetingRoom | undefined;
+   Object.values(rooms).map(item => { if (item.id==meetingroom_id) room = item});
 
    return(
       <div className="w-full h-full overflow-auto">
@@ -13,7 +15,9 @@ export function GroupRoomsList({meetingroom_id, max_future_reservation}: permiss
             className="flex flex-row justify-start items-center"
          >
             <div className="w-[100%] flex flex-row justify-start items-start gap-5">
-               <span>{room.name}</span>
+               {room? 
+                  <span>{room.name}</span>
+               : null}
                <span>{`Максимальное время резервирования: ${parseData(max_future_reservation)}`}</span>
             </div>
          </List.Item>         

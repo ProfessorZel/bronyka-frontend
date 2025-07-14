@@ -3,6 +3,11 @@ export interface Session {
   user: User | null;
 }
 
+export type UserGroup = {
+   name: string;
+   adGroupDN: string;
+}
+
 export interface User {
   id: number;
   email: string;
@@ -11,6 +16,7 @@ export interface User {
   is_verified: boolean;
   fio: string;
   birthdate: string;
+  group: UserGroup;
 }
 
 export interface LoginResponseData {

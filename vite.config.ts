@@ -13,7 +13,12 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
-      "/api": "http://localhost",
+      "/api": {
+        target: "http://localhost",
+      //   changeOrigin: true,
+      //   secure: false,
+      //   rewrite: (path) => path.replace(/^\/api/, ""),
+      },
       "/users": {
         target: "http://localhost",
         changeOrigin: true,

@@ -48,8 +48,8 @@ function AdminRoutes() {
             />
           </Route>
           <Route path="groups" element={<AdminGroupsList />}>
-            <Route path="new" element={<AdminAddGroupForm />} />{/*сделать создание группы*/}
-            <Route path="edit/:groupId" element={<AdminAddGroupForm />} />{/*сделать добовление в группу*/}
+            <Route path="new" element={<AdminAddGroupForm />} />
+            <Route path="edit/:groupId" element={<AdminAddGroupForm />} />
           </Route>
         </Route>
       </Routes>
