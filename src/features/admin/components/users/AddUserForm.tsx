@@ -56,7 +56,7 @@ export function AddUserForm() {
       initFormDataRaw.is_superuser = initFormDatRaw.is_superuser;
       initFormDataRaw.is_verified = initFormDatRaw.is_verified;
       initFormDataRaw.password = initFormDatRaw.password;
-
+      
       if (initFormDatRaw.group) {
          groups.forEach((e) => {
             if (e.name == initFormDatRaw.group.name) {
@@ -65,7 +65,7 @@ export function AddUserForm() {
             }
          });
       }
-
+      
       if (haveGroup) {
          initFormDataRaw.group_id = groupHaves;
       } else {
@@ -74,15 +74,15 @@ export function AddUserForm() {
    }
    
    const initFormData = useMemo(() => initFormDataRaw, [initFormDataRaw.fio]);
-
+   
    const [formData, setFormData] = useState<AddUserFormData>(
       defaultAddUserFormData,
    );
-
+   
    useEffect(() => {
       if (initFormData) setFormData({ ...initFormData });
    }, [initFormData]);
-
+   
    const set = (attrs: Partial<AddUserFormData>) => {
       setFormData({ ...formData, ...attrs });
    };
@@ -102,7 +102,7 @@ export function AddUserForm() {
                type="text"
             />
          </Form.Item>
-         <Form.Item label="Email">
+         <Form.Item label="Логин">
             <Input
                onChange={handleInputChange('email')}
                value={formData.email}
@@ -119,7 +119,7 @@ export function AddUserForm() {
          <Form.Item label="Админ">
             <Checkbox
                onChange={handleCheckboxChange}
-               value={formData.is_superuser}
+               checked={formData.is_superuser}
             />
          </Form.Item>
          <Form.Item label="Группа">

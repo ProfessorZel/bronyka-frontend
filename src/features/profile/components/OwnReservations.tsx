@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { MdDelete } from 'react-icons/md';
 import { mutate } from 'swr';
 import { useOwnReservations } from '../hooks/useOwnReservations';
+import { EditReservationForm } from './EditReservationForm';
 
 interface HistoryToggleProps {
   history: boolean;
@@ -97,11 +98,23 @@ function ListItem({
   from_reserve,
   to_reserve,
   meetingroom,
+  meetingroom_id,
+  user,
+  user_id,
   id,
   send,
 }: ListItemProps) {
   const datetime = `${df(from_reserve)} - ${df(to_reserve)}`;
   const api = useApi();
+  const reservat: Reservation = {
+    id: id,
+    from_reserve: from_reserve,
+    to_reserve: to_reserve,
+    meetingroom: meetingroom,
+    meetingroom_id: meetingroom_id,
+    user: user,
+    user_id: user_id
+  }
 
   return (
     <List.Item>
@@ -117,6 +130,7 @@ function ListItem({
           <p className="font-semibold">
             <span className="font-extrabold">Дата:</span> {datetime}
           </p>
+          <EditReservationForm {...reservat}/>
         </div>
         <Button
           color="red"

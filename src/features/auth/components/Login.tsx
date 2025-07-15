@@ -119,7 +119,7 @@ export function Login({ saveSession }: LoginProps) {
               loading={loading}
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Входим..." : "Войти"}
             </Button>
           </Form.Item>
         </Form>

@@ -105,7 +105,8 @@ export function ReservationForm() {
     const { from, to } = reservationForm;
 
     if (from >= to) {
-      send('error', ['Invalid date and time range for reservation']);
+      // send('error', ['Invalid date and time range for reservation']);
+      send('error', ['Время начала брони не может быть больше времени окончания брони']);
       return;
     }
 

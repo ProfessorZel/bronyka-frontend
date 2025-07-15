@@ -5,10 +5,14 @@ import { Button } from 'antd';
 import { useState } from 'react';
 import { mutate } from 'swr';
 import { ReservationDatetimeForm } from './ReservationDatetimeForm';
+import { useNavigate, useParams } from 'react-router';
 
 export function ReservationListItem(reservation: Reservation) {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const api = useApi();
+  const nav = useNavigate();
+  const params = useParams();
+  const roomId = params.roomId;
 
   return (
     <div className="flex flex-col gap-5">
@@ -44,6 +48,7 @@ export function ReservationListItem(reservation: Reservation) {
       if (!reservationId) return;
 
       await api.delete<Reservation>(`${RESERVATIONS_API}/${reservationId}`);
+      nav(`/admin/rooms/reservations/${roomId}`);
     } catch (e) {
       console.log(e);
     } finally {
