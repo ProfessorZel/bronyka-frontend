@@ -13,12 +13,15 @@ import { isFormValid } from '../../utils';
 // import FormItem from 'antd/es/form/FormItem';
 // import { stringify } from 'querystring';
 
-type AddRoomFormData = Omit<MeetingRoom, 'id'>;
+type AddRoomFormData/*Raw*/ = Omit<MeetingRoom, 'id'>;
+// type AddRoomFormData = Omit<AddRoomFormDataRaw, 'icon'>;
+
+// type AddFileFormData = File;
 
 const defaultAddRoomFormData: AddRoomFormData = {
   name: '',
   description: '',
-//   imageURL: '',
+  // icon: '',
 };
 
 export function AddRoomFrom() {
@@ -32,7 +35,12 @@ export function AddRoomFrom() {
   const [formData, setFormData] = useState<AddRoomFormData>(
     defaultAddRoomFormData,
   );
+
+  // const [ formDataIcon, setFormDataIcon ] = useState<AddFileFormData>();
+
 //   const [imageURL, setImageURL] = useState('');
+  // const { data } = useSWR('api/files/9ea6fb5f_29439.jpg');
+  // console.log(data);
 
   useEffect(() => {
     if (initFormData) setFormData({ ...initFormData });
@@ -41,6 +49,10 @@ export function AddRoomFrom() {
   const set = (attrs: Partial<AddRoomFormData>) => {
     setFormData({ ...formData, ...attrs });
   };
+
+  // const setIcon = (attrs: Partial<AddFileFormData>) => {
+  //   setFormDataIcon({ ...formDataIcon, ...attrs });
+  // };
 
   const isEditMode = !!roomId;
   const title = isEditMode
@@ -64,13 +76,13 @@ export function AddRoomFrom() {
             type="text"
           />
         </Form.Item>
-        {/* <FormItem label="imageURL">
+        {/* <Form.Item label="imageURL">
             <Input
-               onChange={handleInputChangeForImageURL()}
-               value={formData.description.split(';')[1]}
-               type="text"
+              onChange={handleInputIconChange()}
+              // value={formData.icon}
+              type='file'
             />
-        </FormItem> */}
+        </Form.Item> */}
         <Button
           disabled={!isEditMode ? !(isFormValid(formData)/* && imageURL*/) : false}
           shape="round"
@@ -95,6 +107,8 @@ export function AddRoomFrom() {
               `${MEETING_ROOMS_API}/${roomId}`,
               formData,
             );
+
+      // await post('api/files', formDataIcon);
 
       const roomData = res.data;
 
@@ -125,11 +139,16 @@ export function AddRoomFrom() {
     };
   }
 
-//   function handleInputChangeForImageURL() {
-//     return function (e: React.ChangeEvent<HTMLInputElement>) {
-//       setImageURL(e.target.value);
-//     };
-//   }
+  // function handleInputIconChange() {
+  //   return function (e: React.ChangeEvent<HTMLInputElement>) {
+  //     set({ ['icon']: e.target.value.split('\\').pop()});
+  //     if (e.target.files) {
+  //       console.log(e.target.files[0]);
+  //       // setIcon({ ['input']: e.target.files[0] });
+  //       setFormDataIcon(e.target.files[0]);
+  //     }
+  //   }
+  // }
 }
 
 async function mutateSwrRoomsCache(room?: MeetingRoom, create: boolean = true) {

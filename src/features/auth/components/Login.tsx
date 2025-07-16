@@ -71,7 +71,11 @@ export function Login({ saveSession }: LoginProps) {
       }
     } catch (error) {
       console.error("Login failed:", (error as AxiosError).message);
-      send('error', ['Неправильный логин или пароль!\nПроверьте введённые Вами данные!']);
+      if ((error as AxiosError).status) {
+        send('error', ['Неправильный логин или пароль! Проверьте введённые Вами данные!']);
+      } else {
+        send('error', ['Непредвидинная ошибка сервера']);
+      }
     } finally {
       setLoading(false);
     }

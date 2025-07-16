@@ -3,6 +3,7 @@ import { User } from '../admin/types';
 export interface MeetingRoom {
   name: string;
   description: string;
+  // icon: string;
   id: 1;
 }
 
