@@ -1,9 +1,11 @@
 import { Reservation } from '@/features/meeting_rooms/types';
 import { Button, Select } from 'antd';
 import { useState } from 'react';
-import { Calendar, View, Views } from 'react-big-calendar';
+import { Calendar, /*momentLocalizer,*/ View, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 import { calendarConfig } from '../../features/meeting_rooms/calendarConfig';
+// import moment from 'moment';
+// import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 
 export interface BigCalendarEvent {
   title: string;
@@ -16,6 +18,9 @@ export interface BigCalendarEvent {
 interface BigCalendarReservationsProps {
   events: BigCalendarEvent[];
 }
+
+// const localizer = momentLocalizer(moment);
+// const DnDCalendar = withDragAndDrop(Calendar);
 
 export function BigCalendarReservations({
   events,
@@ -59,6 +64,30 @@ export function BigCalendarReservations({
           </Select>
         )}
       </div>
+      {/* <DnDCalendar 
+        defaultDate={moment().toDate()}
+        defaultView="month"
+        onView={() => {}}
+        onNavigate={() => {}}
+        view={activeView}
+        className="bg-white rounded-md"
+        style={{
+          padding: 10,
+        }}
+        events={events ?? []}
+        // defaultDate={new Date()}
+        {...calendarConfig}
+        step={activeStep}
+        localizer={localizer}
+        onEventResize={(e) => {
+          events[0].start = new Date(e.start);
+          events[0].end = new Date(e.end);
+        }}
+        onEventDrop={(e) => {
+          events[0].start = new Date(e.start);
+          events[0].end = new Date(e.end);
+        }}
+      /> */}
       <Calendar
         defaultView={Views.MONTH}
         onView={() => {}}

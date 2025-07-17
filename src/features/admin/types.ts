@@ -36,3 +36,8 @@ export interface GroupRooms {
    id: number;
    permissions: permissionsType[];
 }
+
+export type SheetsInstruction = {
+  service_account_email: string;
+  instructions: string;
+} | undefined;

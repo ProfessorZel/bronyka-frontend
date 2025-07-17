@@ -6,5 +6,6 @@ export { GroupsList as AdminGroupsList } from './components/groups/GroupsList';
 export { AddGroupForm as AdminAddGroupForm } from './components/groups/AddGroupForm';
 export { AddUserForm as AdminAddUserForm } from './components/users/AddUserForm';
 export { UsersList as AdminUsersList } from './components/users/UsersList';
+export { SpreadSheets as AdminSpreadSheets } from './components/spreadsheets/SpreadSheets';
 
 export { AdminLayout } from './layout';

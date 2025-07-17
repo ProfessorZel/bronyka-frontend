@@ -1,4 +1,5 @@
 import { Menu, MenuProps } from 'antd';
+import { CiTimer } from 'react-icons/ci';
 import { FaLaptopCode } from 'react-icons/fa';
 import { FiUsers } from 'react-icons/fi';
 import { GoTools, GoGraph } from 'react-icons/go';
@@ -19,6 +20,11 @@ const navMenuItems = [
      label: 'Группы',
      key: '/admin/groups',
      icon: <GoGraph />,
+   },
+   {
+     label: 'Автоматический табель учета рабочего времени',
+     key: '/admin/spreadsheets',
+     icon: <CiTimer />,
    },
    {
      label: 'Аудит системы',

@@ -7,6 +7,7 @@ import {
   AdminRoomsList,
   AdminGroupsList,
   AdminUsersList,
+  AdminSpreadSheets,
   EventsLogs,
 } from '@/features/admin';
 import { Accessor, Authenticator } from '@/features/auth';
@@ -50,6 +51,8 @@ function AdminRoutes() {
           <Route path="groups" element={<AdminGroupsList />}>
             <Route path="new" element={<AdminAddGroupForm />} />
             <Route path="edit/:groupId" element={<AdminAddGroupForm />} />
+          </Route>
+          <Route path="spreadsheets" element={<AdminSpreadSheets />}>
           </Route>
         </Route>
       </Routes>
