@@ -6,6 +6,8 @@ import { useApi } from "@/app/shared/api/useApi";
 import { AxiosError } from "axios";
 import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
 import { CiCircleAlert } from "react-icons/ci";
+import { Typography } from "antd";
+import { ValidateSheetForm } from "./ValidateSheetForm";
 
 type PromiseReturn = {
     instructMassege: string | undefined, 
@@ -60,8 +62,17 @@ export function SpreadSheets() {
         <div className="flex flex-col h-auto w-full overflow-auto">
             {isValid?
                 <div className="w-full h-full bg-white rounded-lg flex flex-col" style={{ padding: 10 }}>
-                    <span>{serviceAccountEmail}</span>
-                    <span>{instructions}</span>
+                    <div className="w-full ant-col flex flex-col justify-between items-start gap-5" style={{ padding: 10 }}>
+                        <div className="ant-col flex flex-col justify-between items-start">
+                            <Typography.Title level={5} style={{ padding: 0 }}>Email:</Typography.Title>
+                            <span>{serviceAccountEmail}</span>
+                        </div>
+                        <div className="ant-col flex flex-col justify-between items-start">
+                            <Typography.Title level={5} style={{ padding: 0 }}>Чдо делать:</Typography.Title>
+                            <span>{instructions}</span>
+                        </div>
+                        <ValidateSheetForm />
+                    </div>
                 </div>
             :<div className="w-full h-full bg-white rounded-lg flex flex-col items-center" style={{ padding: 10 }}>
                 <span>{instructions}</span>

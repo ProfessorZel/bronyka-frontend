@@ -43,7 +43,11 @@ export function Header() {
         className="text-black text-xl md:text-2xl text-center md:text-left"
       >
         <div className="flex flex-row justify-start items-center gap-2">
-          {!isHomePage ? <IoHomeSharp /> : ''} Рабочие места
+          <Button
+            icon={!isHomePage ? <IoHomeSharp size={25} /> : ''}
+            type='primary'
+            size='large'
+          ><span style={{ fontWeight: 'bold' }}>Рабочие места</span></Button>
         </div>
       </NavLink>
       <div className="flex flex-row gap-3 md:gap-5 items-center">
@@ -62,7 +66,7 @@ export function Header() {
             size="large"
             // icon={<CgProfile />}
             className="self-center"
-         >Выйти</Button>
+         ><span style={{ fontWeight: 'bold' }}>Выйти</span></Button>
       </div>
     </div>
   );

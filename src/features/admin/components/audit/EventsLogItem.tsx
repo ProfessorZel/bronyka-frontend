@@ -12,7 +12,7 @@ export function EventLogItem({ description, user, time }: EventLogItemProps) {
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         <span>{dateTimeFormatter(time)}</span>
-        <span>{user.fio}</span>
+        <span>{user?.fio}</span>
         <span>{description}</span>
       </div>
     </List.Item>

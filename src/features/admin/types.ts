@@ -15,8 +15,8 @@ export interface User {
 export interface EventLog {
   time: string;
   description: string;
-  user_id: number;
-  user: User;
+  user_id: number | undefined;
+  user: User | undefined;
 }
 
 export interface Group {
@@ -41,3 +41,13 @@ export type SheetsInstruction = {
   service_account_email: string;
   instructions: string;
 } | undefined;
+
+export type Sheets = {
+  sheet: string;
+}
+
+export interface SpreadSheetsValidate{
+  spreadsheet_url: string;
+  title: string;
+  worksheets: string[];
+}
