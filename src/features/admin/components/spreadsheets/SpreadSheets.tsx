@@ -68,7 +68,7 @@ export function SpreadSheets() {
                             <span>{serviceAccountEmail}</span>
                         </div>
                         <div className="ant-col flex flex-col justify-between items-start">
-                            <Typography.Title level={5} style={{ padding: 0 }}>Чдо делать:</Typography.Title>
+                            <Typography.Title level={5} style={{ padding: 0 }}>Что делать:</Typography.Title>
                             <span>{instructions}</span>
                         </div>
                         <ValidateSheetForm />

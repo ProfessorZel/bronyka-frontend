@@ -1,4 +1,4 @@
-import { Typography, Form, Input, Button, List, Card } from "antd";
+import { Typography, Form, Input, Button } from "antd";
 import { useState } from "react";
 import { isFormValid } from "../../utils";
 import { useApi } from "@/app/shared/api/useApi";
@@ -7,6 +7,9 @@ import { GOOGLE_SHEETS_VALIDATE_API } from "@/app/shared/constants";
 import { AxiosError } from "axios";
 import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
 import { useNotifications } from "@/app/shared/hooks/useNotifications";
+import { SheetSelector } from "./SheetsSelector";
+import { motion, useTime, useTransform } from "motion/react";
+import { LuLoaderCircle } from "react-icons/lu";
 
 type detale = {
     loc?: string[] | undefined;
@@ -32,11 +35,11 @@ const defaultFormData: dataUrl = {
 
 // const sheets = ["Т-2025", "И-2025", "ГПР-2025", "НН", "И-2024", "Т-2024"]
 
-// const testTab: SpreadSheetsValidate = {
-//     title: 'Табель учета рабочего времени',
-//     spreadsheet_url: 'https://docs.google.com/spreadsheets/d/12QFIRngaCI-m46ff20WTW0RZk3g3dcWkUNl-1j9eTyQ',
-//     worksheets: sheets,
-// }
+const testTab: SpreadSheetsValidate = {
+    title: '',//Табель учета рабочего времени
+    spreadsheet_url: '',//https://docs.google.com/spreadsheets/d/12QFIRngaCI-m46ff20WTW0RZk3g3dcWkUNl-1j9eTyQ
+    worksheets: [''],//sheets
+}
 
 export function ValidateSheetForm() {
     const { post } = useApi();
@@ -46,7 +49,10 @@ export function ValidateSheetForm() {
     );
     const [ loading, setLoading ] = useState(false);
     const [ disabledUrlChange, setDisabledUrlChange ] = useState(false);
-    const [ spreadSheets, setSpreadSheets ] = useState<SpreadSheetsValidate>();
+    const [ spreadSheets, setSpreadSheets ] = useState<SpreadSheetsValidate>(testTab);
+
+    const time = useTime();
+    const rotate = useTransform(time, [0, 500], [0, 360], { clamp: false });
 
     return(
         <div className="w-full flex flex-col justify-between items-start gap-2">
@@ -69,20 +75,17 @@ export function ValidateSheetForm() {
                         shape="round"
                         htmlType="submit"
                         type="primary"
-                    >{loading? 'Применяем...': 'Применить'}</Button>
+                    >Применить</Button>
                 : null}
             </Form>
-            {disabledUrlChange?
-                <Card className="w-full">
-                    <Typography.Title level={5} style={{ padding: 0 }}>{spreadSheets?.title}</Typography.Title>
-                    <List
-                        className="flex flex-col w-full"
-                        style={{ paddingTop: 10 }}
-                        dataSource={spreadSheets?.worksheets}
-                        renderItem={(sheet, num=0) => ListItem(sheet, num+1)}
-                    />
-                </Card>
-            : null}
+            {loading?
+                <div className="w-full h-full flex justify-center items-center" style={{ padding: 30 }}>
+                    <motion.div
+                        className="w-[50px] h-[50px]"
+                        style={{ rotate, color: '#1677ff' }}
+                    ><LuLoaderCircle className="w-[100%] h-[100%]"/></motion.div>
+                </div>
+            : disabledUrlChange? <SheetSelector {...spreadSheets}/>: null}
             {ctx}
         </div>
     );
@@ -95,17 +98,19 @@ export function ValidateSheetForm() {
 
     async function handelSubmit() {
         setLoading(true);
+        setDisabledUrlChange(true);
 
         try {
             const res = await post<SpreadSheetsValidate>(GOOGLE_SHEETS_VALIDATE_API, formData);
             console.log(res.data);
             setSpreadSheets(res.data);
-            setDisabledUrlChange(true);
 
             send('success', [`Доступ к талице "${res.data.title}" успешно получен`])
         } catch(error) {
+            setDisabledUrlChange(false)
             const err = error as AxiosError;
-            if (err.status === 400) {
+
+            if (err.status === 422 || err.status === 400) {
                 const errHasData = err as AxiosError & {
                     data: ResponseApiUnprocessableEntity;
                 };
@@ -145,12 +150,4 @@ export function ValidateSheetForm() {
             setLoading(false);
         }
     }
-}
-
-function ListItem(sheet: string, num: number) {
-    return(
-        <List.Item >
-            <span>Лист_{num}: {sheet}</span>
-        </List.Item>
-    );
 }
