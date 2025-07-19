@@ -1,13 +1,16 @@
 import { Button, Card, List, Radio, Typography } from "antd";
 import { SpreadSheetsValidate } from "../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "@/app/shared/api/useApi";
 import { useNotifications } from "@/app/shared/hooks/useNotifications";
 import { AxiosError } from "axios";
 import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
-import { motion, useTime, useTransform } from "motion/react";
-import { LuLoaderCircle } from "react-icons/lu";
-import { FcOk } from "react-icons/fc";
+import { hover, motion } from "motion/react";
+import { GOOGLE_SHEETS_API } from "@/app/shared/constants";
+import { WorkSheets } from "./WorkSheets";
+import { animate } from "motion";
+import { mutate } from "swr";
+import { CircleLoading } from "@/app/shared/animatedcomponents/CircleLoading";
 
 interface SheetData {
     spreadsheet_url: string;
@@ -38,57 +41,81 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
     const [ sheetData, setSheetData ] = useState<SheetData>(defaultSheetData);
     const [ disabled, setDisabled ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(false);
+    const [ isList, setIsList ] = useState(false);
 
-    const time = useTime();
-    const rotate = useTransform(time, [0, 500], [0, 360], { clamp: false });
+    useEffect(()=>{
+        hover(".box", (element) => {
+            animate(element, { background: '#1677ff', color: '#ffffff' })
+    
+            return () => animate(element, { background: '#ffffff', color: '#000000' })
+        })
+        hover(".li", (element) => {
+            animate(element, { background: '#84bbff', color: '#ffffff' })
+    
+            return () => animate(element, { background: '#ffffff', color: '#000000' })
+        })
+    }, [document.querySelector('.box'), document.querySelector('.li')]);
 
     return(
         <div className="w-full flex flex-col">
-            {!disabled? 
-                <Card className="w-full flex flex-col">
-                    <div className="w-full flex flex-col">
-                        <Typography.Title level={5} style={{ padding: 0 }}>{title}</Typography.Title>
-                        <span>Добавить лист в работу</span>
-                        <Radio.Group value={sheetData.worksheet}>
-                            <List
-                                className="flex flex-col w-full"
-                                style={{ paddingTop: 10 }}
-                                dataSource={worksheets}
-                                renderItem={(sheet, num=0) => {
-                                    return(<List.Item >
-                                        <div className="w-full">
-                                            <Radio
-                                                className="w-full"
-                                                value={sheet}
-                                                onClick={() => {setSheetData({spreadsheet_url: spreadsheet_url, worksheet: sheet})}}
+            <Typography.Title level={5} style={{ padding: 0 }}>Таблица '{title}'</Typography.Title>
+            {!disabled?
+                <div>
+                    <Card className="w-full flex flex-col">
+                        <div className="w-full flex flex-col">
+                            <motion.div
+                                className="box"
+                                initial={{ scale: 1, filter: "drop-shadow(0 0 #4d97ffff)", background: '#ffffff' }}
+                                whileTap={{ scale: 0.999, filter: "drop-shadow(0px 0px 4px #4d97ffff)" }}
+                                style={{ padding: 10, borderRadius: 5 }}
+                                onClick={() => {setIsList(!isList)}}
+                            >
+                                <span>Добавить книгу в работу</span>
+                            </motion.div>
+                        </div>
+                        {isList &&<div className="flex flex-col">
+                            <Radio.Group value={sheetData.worksheet}>
+                                <List
+                                    className="flex flex-col w-full"
+                                    style={{ paddingTop: 10, paddingBottom: 10 }}
+                                    dataSource={worksheets}
+                                    renderItem={(sheet, num=0) => {
+                                        return(
+                                            <motion.div 
+                                                className="li"
+                                                style={{ paddingLeft: 10, borderRadius: 5 }}
+                                                initial={{ scale: 1, filter: "drop-shadow(0 0 #4d97ffff)", background: '#ffffff' }}
+                                                whileTap={{ scale: 0.999, filter: "drop-shadow(0px 0px 4px #4d97ffff)" }}
                                             >
-                                                <span>Лист_{num+1}: {sheet}</span>
-                                            </Radio>
-                                        </div>
-                                    </List.Item>);
-                                }}
-                            />
-                        </Radio.Group>
-                    </div>
-                    <Button
-                        onClick={handelAddSheet}
-                        shape="round"
-                        type="primary"
-                    >Добавить</Button>
-                </Card>
+                                                <Radio
+                                                    className="w-full h-full"
+                                                    style={{ paddingTop: 10, paddingBottom: 10 }}
+                                                    value={sheet}
+                                                    onClick={() => {setSheetData({spreadsheet_url: spreadsheet_url, worksheet: sheet})}}
+                                                >
+                                                    <div className="w-full">
+                                                        <span>Книга_{num+1}: {sheet}</span>
+                                                    </div>
+                                                </Radio>
+                                            </motion.div>
+                                        );
+                                    }}
+                                />
+                            </Radio.Group>
+                            <Button
+                                onClick={handelAddSheet}
+                                shape="round"
+                                type="primary"
+                            >Добавить</Button>
+                        </div>}
+                    </Card>
+                </div>
             : isLoading? 
                 <div className="w-full h-full flex justify-center items-center" style={{ padding: 30 }}>
-                    <motion.div
-                        className="w-[50px] h-[50px]"
-                        style={{ rotate, color: '#1677ff' }}
-                    ><LuLoaderCircle className="w-[100%] h-[100%]"/></motion.div>
+                    <CircleLoading />
                 </div>
-            : <div className="w-full h-full flex justify-center items-center" style={{ padding: 30 }}>
-                <div className="flex flex-row justify-center items-center gap-2">
-                    <FcOk size={50}/>
-                    <span>Успех</span>
-                </div>
-            </div>}
+            : null}
+            <WorkSheets/>
             {ctx}
         </div>
     );
@@ -97,12 +124,14 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
         setDisabled(true);
         setIsLoading(true)
         try {
-            const response = await api.post('api/googlesheets', sheetData);
+            const response = await api.post(GOOGLE_SHEETS_API, sheetData);
             if (response.status === 200) {
-                send('success', ['Лист таблицы готов к работе']);
+                send('success', ['Книга таблицы готов к работе']);
             }
+            await mutate(() => true, undefined, { revalidate: true });
         } catch(error) {
             const err = error as AxiosError;
+            setDisabled(false);
             if (err.status === 422 || err.status === 400) {
                 const errHasData = err as AxiosError & {
                     data: ResponseApiUnprocessableEntity;

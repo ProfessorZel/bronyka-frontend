@@ -8,8 +8,7 @@ import { AxiosError } from "axios";
 import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
 import { useNotifications } from "@/app/shared/hooks/useNotifications";
 import { SheetSelector } from "./SheetsSelector";
-import { motion, useTime, useTransform } from "motion/react";
-import { LuLoaderCircle } from "react-icons/lu";
+import { CircleLoading } from "@/app/shared/animatedcomponents/CircleLoading";
 
 type detale = {
     loc?: string[] | undefined;
@@ -51,9 +50,6 @@ export function ValidateSheetForm() {
     const [ disabledUrlChange, setDisabledUrlChange ] = useState(false);
     const [ spreadSheets, setSpreadSheets ] = useState<SpreadSheetsValidate>(testTab);
 
-    const time = useTime();
-    const rotate = useTransform(time, [0, 500], [0, 360], { clamp: false });
-
     return(
         <div className="w-full flex flex-col justify-between items-start gap-2">
             <Form labelWrap onSubmitCapture={handelSubmit} labelCol={{ span: 3 }} className="w-full">
@@ -71,6 +67,7 @@ export function ValidateSheetForm() {
                 </Form.Item>
                 {!disabledUrlChange?
                     <Button
+                        className="w-full"
                         disabled={!isFormValid(formData)}
                         shape="round"
                         htmlType="submit"
@@ -78,14 +75,9 @@ export function ValidateSheetForm() {
                     >Применить</Button>
                 : null}
             </Form>
-            {loading?
-                <div className="w-full h-full flex justify-center items-center" style={{ padding: 30 }}>
-                    <motion.div
-                        className="w-[50px] h-[50px]"
-                        style={{ rotate, color: '#1677ff' }}
-                    ><LuLoaderCircle className="w-[100%] h-[100%]"/></motion.div>
-                </div>
-            : disabledUrlChange? <SheetSelector {...spreadSheets}/>: null}
+            {loading? <div className="w-full h-full flex justify-center items-center" style={{ padding: 30 }}>
+                <CircleLoading />
+            </div>: disabledUrlChange? <SheetSelector {...spreadSheets}/>: null}
             {ctx}
         </div>
     );
@@ -102,7 +94,6 @@ export function ValidateSheetForm() {
 
         try {
             const res = await post<SpreadSheetsValidate>(GOOGLE_SHEETS_VALIDATE_API, formData);
-            console.log(res.data);
             setSpreadSheets(res.data);
 
             send('success', [`Доступ к талице "${res.data.title}" успешно получен`])
@@ -119,7 +110,6 @@ export function ValidateSheetForm() {
                     .flatMap(({ msg }) => (msg ? [msg] : []))
                     .filter(Boolean);
                     send('error', errorMessages);
-                    console.log(errorMessages);
                 }
                 
                 if (isObject(errHasData.data.detail)) {
@@ -139,7 +129,6 @@ export function ValidateSheetForm() {
                 
                 if (typeof errHasData.data.detail === 'string') {
                     send('error', errHasData.data.detail);
-                    console.log(errHasData.data.detail);
                 }
 
             } else {

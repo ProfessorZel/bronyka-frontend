@@ -51,3 +51,10 @@ export interface SpreadSheetsValidate{
   title: string;
   worksheets: string[];
 }
+
+export interface WorkSheets {
+    id: number;
+    spreadsheet_url: string;
+    worksheet: string;
+    service_account_email: string;
+}
