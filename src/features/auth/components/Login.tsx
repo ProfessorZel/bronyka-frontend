@@ -86,7 +86,7 @@ export function Login({ saveSession }: LoginProps) {
         <div className="min-h-screen flex items-center justify-center">
             <Card className="w-full max-w-xl shadow-lg">
                 <Typography.Title level={2} className="text-center mb-8">
-                    {loading? "Добро пожаловать": "Производиться вход..."}
+                    {!loading? "Добро пожаловать": "Производиться вход..."}
                 </Typography.Title>
                 {!loading? null: <Typography.Title level={4} className="text-center mb-8">
                     Подождите немного
