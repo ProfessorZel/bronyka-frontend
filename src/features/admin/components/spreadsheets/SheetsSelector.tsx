@@ -39,7 +39,7 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
         worksheet: ''
     }
     const [ sheetData, setSheetData ] = useState<SheetData>(defaultSheetData);
-    const [ disabled, setDisabled ] = useState(false);
+    // const [ disabled, setDisabled ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(false);
     const [ isList, setIsList ] = useState(false);
 
@@ -59,7 +59,7 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
     return(
         <div className="w-full flex flex-col">
             <Typography.Title level={5} style={{ padding: 0 }}>Таблица '{title}'</Typography.Title>
-            {!disabled?
+            {!isLoading?
                 <div>
                     <Card className="w-full flex flex-col">
                         <div className="w-full flex flex-col">
@@ -73,7 +73,7 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
                                 <span>Добавить книгу в работу</span>
                             </motion.div>
                         </div>
-                        {isList &&<div className="flex flex-col">
+                        {isList && <div className="flex flex-col">
                             <Radio.Group value={sheetData.worksheet}>
                                 <List
                                     className="flex flex-col w-full"
@@ -121,7 +121,7 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
     );
 
     async function handelAddSheet() {
-        setDisabled(true);
+        // setDisabled(true);
         setIsLoading(true)
         try {
             const response = await api.post(GOOGLE_SHEETS_API, sheetData);
@@ -131,7 +131,7 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
             await mutate(() => true, undefined, { revalidate: true });
         } catch(error) {
             const err = error as AxiosError;
-            setDisabled(false);
+            // setDisabled(false);
             if (err.status === 422 || err.status === 400) {
                 const errHasData = err as AxiosError & {
                     data: ResponseApiUnprocessableEntity;
@@ -166,7 +166,8 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
                 console.error(err);
             }
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
+            setIsList(false);
         }
     }
 }
