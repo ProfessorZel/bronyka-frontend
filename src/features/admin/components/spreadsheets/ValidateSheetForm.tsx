@@ -32,12 +32,10 @@ const defaultFormData: dataUrl = {
     spreadsheet_url: ''
 }
 
-// const sheets = ["Т-2025", "И-2025", "ГПР-2025", "НН", "И-2024", "Т-2024"]
-
 const testTab: SpreadSheetsValidate = {
-    title: '',//Табель учета рабочего времени
-    spreadsheet_url: '',//https://docs.google.com/spreadsheets/d/12QFIRngaCI-m46ff20WTW0RZk3g3dcWkUNl-1j9eTyQ
-    worksheets: [''],//sheets
+    title: '',
+    spreadsheet_url: '',
+    worksheets: [''],
 }
 
 export function ValidateSheetForm() {

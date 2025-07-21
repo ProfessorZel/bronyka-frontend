@@ -8,6 +8,8 @@ import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
 import { CiCircleAlert } from "react-icons/ci";
 import { Typography } from "antd";
 import { ValidateSheetForm } from "./ValidateSheetForm";
+import { WorkSheets } from "./WorkSheets";
+import { useWorkSheets } from "../../hooks/useWorkSheets";
 
 type PromiseReturn = {
     instructMassege: string | undefined, 
@@ -20,7 +22,9 @@ export function SpreadSheets() {
         undefined
     );
     const [ isValid, setIsValid ] = useState(true);
-    const [ serviceAccountEmail , setEmail ] = useState<string>('berffbd@email.com');
+    const [ serviceAccountEmail , setEmail ] = useState<string>();
+
+    const worksheets = useWorkSheets();
 
     async function SpreadSheetsInstuctions(): Promise<PromiseReturn | undefined> {
         try {
@@ -73,6 +77,7 @@ export function SpreadSheets() {
                                 <span>{instructions}</span>
                             </div>
                         </div>
+                        <WorkSheets worksheetArr={[...worksheets]}/>
                         <ValidateSheetForm />
                     </div>
                 </div>

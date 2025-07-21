@@ -3,6 +3,10 @@ import { BigCalendarReservations } from '../../../app/shared/BigCalendarReservat
 import { useMeetingRoomReservation } from '../hooks/useMeetingRoomReservation';
 
 import { ReservationForm } from './ReservationForm';
+// import { useParams } from 'react-router';
+// import { useRoom } from '@/features/admin/hooks/useRoom';
+// import useSWR from 'swr';
+// import { USERS_API } from '@/app/shared/constants';
 
 const listStyles = {
   paddingLeft: 20,
@@ -13,6 +17,11 @@ const listStyles = {
 
 export function MeetingRoom() {
   const reservation = useMeetingRoomReservation();
+  // const { roomId } = useParams();
+  // const meetingroom = useRoom(roomId);
+  // const { data } = useSWR(`${USERS_API}/me`);
+  // const userId = data.id;
+
   return (
     <div
       style={listStyles}
@@ -20,7 +29,11 @@ export function MeetingRoom() {
     >
       <ReservationForm />
       <BigCalendarReservations
-        events={reservation ? reservationForBigCalendarDTO(reservation) : []}
+        event={reservation ? reservationForBigCalendarDTO(reservation) : []}
+        // meetingRoom={meetingroom}
+        // roomId={parseInt(roomId? roomId: '0')}
+        // userId={String(userId)}
+        // user={data}
       />
     </div>
   );

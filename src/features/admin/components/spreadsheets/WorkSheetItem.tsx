@@ -9,13 +9,14 @@ import { useNotifications } from "@/app/shared/hooks/useNotifications";
 import { AxiosError } from "axios";
 import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
 
-export function WorkSheetItem({ id, worksheet }: WorkSheets) {
+export function WorkSheetItem({ id, spreadsheet_url, worksheet }: WorkSheets) {
     const api = useApi();
     const { send, ctx } = useNotifications();
 
     return(
         <>
             <List.Item>
+                <span>{spreadsheet_url}</span>
                 <span>{worksheet}</span>
                 <Button 
                     onClick={handleDeleteRoom}

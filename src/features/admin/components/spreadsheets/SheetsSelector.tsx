@@ -7,7 +7,6 @@ import { AxiosError } from "axios";
 import { ResponseApiUnprocessableEntity } from "@/app/shared/api/types";
 import { hover, motion } from "motion/react";
 import { GOOGLE_SHEETS_API } from "@/app/shared/constants";
-import { WorkSheets } from "./WorkSheets";
 import { animate } from "motion";
 import { mutate } from "swr";
 import { CircleLoading } from "@/app/shared/animatedcomponents/CircleLoading";
@@ -39,16 +38,10 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
         worksheet: ''
     }
     const [ sheetData, setSheetData ] = useState<SheetData>(defaultSheetData);
-    // const [ disabled, setDisabled ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(false);
     const [ isList, setIsList ] = useState(false);
 
     useEffect(()=>{
-        hover(".box", (element) => {
-            animate(element, { background: '#1677ff', color: '#ffffff' })
-    
-            return () => animate(element, { background: '#ffffff', color: '#000000' })
-        })
         hover(".li", (element) => {
             animate(element, { background: '#84bbff', color: '#ffffff' })
     
@@ -63,15 +56,13 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
                 <div>
                     <Card className="w-full flex flex-col">
                         <div className="w-full flex flex-col">
-                            <motion.div
-                                className="box"
-                                initial={{ scale: 1, filter: "drop-shadow(0 0 #4d97ffff)", background: '#ffffff' }}
-                                whileTap={{ scale: 0.999, filter: "drop-shadow(0px 0px 4px #4d97ffff)" }}
-                                style={{ padding: 10, borderRadius: 5 }}
+                            <Button
                                 onClick={() => {setIsList(!isList)}}
+                                type="primary"
+                                size="large"                 
                             >
-                                <span>Добавить книгу в работу</span>
-                            </motion.div>
+                                Добавить книгу в работу
+                            </Button>
                         </div>
                         {isList && <div className="flex flex-col">
                             <Radio.Group value={sheetData.worksheet}>
@@ -79,7 +70,7 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
                                     className="flex flex-col w-full"
                                     style={{ paddingTop: 10, paddingBottom: 10 }}
                                     dataSource={worksheets}
-                                    renderItem={(sheet, num=0) => {
+                                    renderItem={(sheet) => {
                                         return(
                                             <motion.div 
                                                 className="li"
@@ -94,7 +85,7 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
                                                     onClick={() => {setSheetData({spreadsheet_url: spreadsheet_url, worksheet: sheet})}}
                                                 >
                                                     <div className="w-full">
-                                                        <span>Книга_{num+1}: {sheet}</span>
+                                                        <span>{sheet}</span>
                                                     </div>
                                                 </Radio>
                                             </motion.div>
@@ -115,7 +106,6 @@ export function SheetSelector({ spreadsheet_url, title, worksheets}: SpreadSheet
                     <CircleLoading />
                 </div>
             : null}
-            <WorkSheets/>
             {ctx}
         </div>
     );
