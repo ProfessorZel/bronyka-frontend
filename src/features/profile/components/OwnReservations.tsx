@@ -1,7 +1,7 @@
 import { ResponseApiUnprocessableEntity } from '@/app/shared/api/types';
 import { useApi } from '@/app/shared/api/useApi';
 import { BigCalendarReservations } from '@/app/shared/BigCalendarReservations';
-import { RESERVATIONS_API } from '@/app/shared/constants';
+import { RESERVATIONS_API, USERS_API } from '@/app/shared/constants';
 import {
   NotificationType,
   useNotifications,
@@ -16,7 +16,7 @@ import { Button, List, Switch } from 'antd';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { MdDelete } from 'react-icons/md';
-import { mutate } from 'swr';
+import useSWR, { mutate } from 'swr';
 import { useOwnReservations } from '../hooks/useOwnReservations';
 import { EditReservationForm } from './EditReservationForm';
 
@@ -39,6 +39,8 @@ export function OwnReservationsList() {
   const { send, ctx } = useNotifications();
 
   const reservations = useOwnReservations(history);
+  const { data } = useSWR(`${USERS_API}/me`);
+  const userId = data.id;
 
   return (
     <div className="h-auto w-full overflow-y-auto">
@@ -52,6 +54,10 @@ export function OwnReservationsList() {
         {viewCalendar ? (
           <BigCalendarReservations
             events={reservationForBigCalendarDTO(reservations)}
+            meetingRoom={null}
+            roomId={undefined}
+            userId={String(userId)}
+            user={data}
           />
         ) : (
           <List
