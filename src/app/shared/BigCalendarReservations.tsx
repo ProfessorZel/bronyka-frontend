@@ -14,7 +14,7 @@ import { useApi } from './api/useApi';
 import { mutate } from 'swr';
 import { useNotifications } from './hooks/useNotifications';
 import { User } from '@/features/admin/types';
-import dayjs from 'dayjs';
+import { DataModal } from './Modal-rbc';
 
 export interface BigCalendarEvent {
   title: string;
@@ -30,6 +30,12 @@ interface BigCalendarReservationsProps {
   roomId: number | undefined;
   meetingRoom: MeetingRoom | null;
   user: User;
+}
+
+interface ModalData {
+  isCreate: boolean;
+  isModalOpen: boolean;
+  reservData: Reservation;
 }
 
 function keys<T extends object>(obj: T) {
@@ -48,10 +54,36 @@ export function BigCalendarReservations({
 }: BigCalendarReservationsProps) {
   const [activeView, setActiveView] = useState<View>(Views.WEEK);
   const [activeStep, setActiveStep] = useState<number>(30);//calendarConfig.step
-  // const [ events, setEvents ] = useState<BigCalendarEvent[]>(event);
   const api = useApi();
   const { send, ctx } = useNotifications();
   console.log(userId, roomId);
+
+  const defaultModalData: ModalData = {
+    isCreate: true,
+    isModalOpen: false,
+    reservData: {
+      id: newEventId(),
+      from_reserve: String(new Date(events[0].start)),
+      to_reserve: String(new Date(events[0].end)),
+      meetingroom_id: parseInt(String(roomId)),
+      meetingroom: meetingRoom? meetingRoom: {id: 1, name: '', description:  ''},
+      user: user,
+      user_id: parseInt(String(userId)),
+    }
+  }
+  
+  const [ modulData, setIsModal ] = useState<ModalData>(defaultModalData);
+  function showModal(e: string, reservElement: Reservation) {
+    if (e === 'create') {
+      setIsModal({ isModalOpen: true, isCreate: true, reservData: {...reservElement} });
+    } else {
+      setIsModal({ isModalOpen: true, isCreate: false, reservData: {...reservElement} })
+    }
+  }
+
+  function closeModul() {
+    setIsModal({...modulData, isModalOpen: false});
+  }
 
   function newEventId() {
     let max = 0;
@@ -121,8 +153,8 @@ export function BigCalendarReservations({
         onEventResize={(e) => reSizeEvent(e)}
         onEventDrop={(e) => dropEvent(e)}
         onSelectSlot={(e) => addEvent(e)}
-        onDoubleClickEvent={(e) => deleteEvent(e)}
-        popup
+        onDoubleClickEvent={(e) => modalEvent(e)}
+        onKeyPressEvent={(e, keyPressed) => deleteEvent(e, keyPressed)}
       >
       </DnDCalendar>
       {/* <Popover
@@ -132,15 +164,14 @@ export function BigCalendarReservations({
       >
         <Button>sdvv</Button>
       </Popover> */}
-      {/* <Modal
-        title="Создать бронь"
-        closable={{ 'aria-label': 'Custom Close Button' }}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        
-      </Modal> */}
+      <DataModal
+        isCreate={modulData.isCreate}
+        isModalOpen={modulData.isModalOpen}
+        handleOk={() => {return setIsModal({...modulData, isModalOpen: false})}}
+        handleCancel={() => closeModul()}
+        handelDelete={() => {return setIsModal({...modulData, isModalOpen: false})}}
+        reservForm={modulData.reservData}
+      />
       {/* <Calendar
         defaultView={Views.MONTH}
         onView={() => {}}
@@ -213,21 +244,26 @@ export function BigCalendarReservations({
         end = new Date(end);
         start = new Date(start);
         console.log((end.getTime()-start.getTime())/1000/3600);
-        // showModal();
-        DataModal({
-          id: newEventId(),
-          from_reserve: String(new Date(e.start)),
-          to_reserve: String(new Date(e.end)),
-          meetingroom_id: parseInt(String(roomId)),
-          meetingroom: meetingRoom? meetingRoom: {id: 1, name: '', description: ''},
-          user: user,
-          user_id: parseInt(String(userId)),
-        });
+        showModal('create', defaultModalData.reservData);
       }
     }
   }
 
-  function deleteEvent(e: any) {
+  function deleteEvent(e: any, keyPressed: any) {
+    if (keyPressed.key === 'Delete') {
+      const eResource = keys(e)[keys(e).length - 1];
+      const eResourceKeys = keys(e[eResource]);
+      let eId;
+      eResourceKeys.map(el => {
+        if (el === 'id') {
+          eId = e[eResource][el];
+        }
+      });
+      handleDeleteReservation(eId);
+    }
+  }
+
+  function modalEvent(e: any) {
     const eResource = keys(e)[keys(e).length - 1];
     const eResourceKeys = keys(e[eResource]);
     let eId;
@@ -236,10 +272,11 @@ export function BigCalendarReservations({
         eId = e[eResource][el];
       }
     });
-    // handleDeleteReservation(eId);
-    DataModal(e.resource);
+    console.log(e[eResource]);
+    showModal('change', e[eResource]);
   }
 
+  //requests
   function dateCustomFormatting(date: Date): string {
       const padStart = (value: number): string =>
          value.toString().padStart(2, '0');
@@ -332,80 +369,6 @@ export function BigCalendarReservations({
     } else {
       send('error', ['Произошла непредвиденная ошибка']);
     }
-  }
-
-  function DataModal(reservationForm: Reservation) {
-    Modal.info({
-      icon: null,
-      title: "Создать бронь",
-      closable: { 'aria-label': 'Custom Close Button' },
-      content: (
-        <Form>
-          <Form.Item label="От">
-            <DatePicker
-              value={dayjs(reservationForm.from_reserve)}
-              showTime={{
-                minuteStep: 10,
-                showHour: true,
-                showMinute: true,
-              }}
-              onChange={(_, dateStr) =>{}
-                // setReservationForm({
-                //   ...reservationForm,
-                //   from: new Date(dateStr as string),
-                // })
-              }
-              allowClear={false}
-            />
-          </Form.Item>
-          <Form.Item label="До">
-            <DatePicker
-              showTime={{
-                minuteStep: 10,
-                showHour: true,
-                showMinute: true,
-              }}
-              value={dayjs(reservationForm.to_reserve)}
-              onChange={(_, dateStr) =>{}
-                // setReservationForm({
-                //   ...reservationForm,
-                //   to: new Date(dateStr as string),
-                // })
-              }
-              allowClear={false}
-            />
-          </Form.Item>
-        </Form>
-        // <div className='w-[full] flex flex-col'>  
-        //   <span>Комната:</span>
-        //   <Select
-        //     defaultValue={30}
-        //     onChange={() => {}}
-        //   >
-        //     <Select.Option value={10}>10 минут</Select.Option>
-        //     <Select.Option value={15}>15 минут</Select.Option>
-        //     <Select.Option value={30}>30 минут</Select.Option>
-        //     <Select.Option value={60}>1 час</Select.Option>
-        //   </Select>
-        //   <span>Начало брони:</span>
-        //   <span>{String(new Date())}</span>
-        //   <span>Продолжительность в часах</span>
-        //   <Select
-        //     defaultValue={1}
-        //     onChange={() => {}}
-        //   >
-        //     {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(e => {
-        //       return <Select.Option value={e}>{e}</Select.Option>;
-        //     })}
-        //   </Select>
-        //   <span>Конец брони:</span>
-        //   <span>{String(new Date())}</span>
-        // </div>
-      ),
-      okCancel: true,
-      maskClosable: true,
-      onOk() { },
-    });
   }
 }
 
