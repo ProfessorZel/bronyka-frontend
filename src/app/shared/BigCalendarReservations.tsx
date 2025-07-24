@@ -1,5 +1,5 @@
 import { MeetingRoom, Reservation } from '@/features/meeting_rooms/types';
-import { Button, Modal, Form, Select, DatePicker } from 'antd';
+import { Button, Select } from 'antd';
 import { useState } from 'react';
 import { Calendar, momentLocalizer, View, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
@@ -35,7 +35,6 @@ interface BigCalendarReservationsProps {
 interface ModalData {
   isCreate: boolean;
   isModalOpen: boolean;
-  reservData: Reservation;
 }
 
 function keys<T extends object>(obj: T) {
@@ -56,28 +55,32 @@ export function BigCalendarReservations({
   const [activeStep, setActiveStep] = useState<number>(30);//calendarConfig.step
   const api = useApi();
   const { send, ctx } = useNotifications();
-  console.log(userId, roomId);
-
+  
   const defaultModalData: ModalData = {
     isCreate: true,
     isModalOpen: false,
-    reservData: {
-      id: newEventId(),
-      from_reserve: String(new Date(events[0].start)),
-      to_reserve: String(new Date(events[0].end)),
-      meetingroom_id: parseInt(String(roomId)),
-      meetingroom: meetingRoom? meetingRoom: {id: 1, name: '', description:  ''},
-      user: user,
-      user_id: parseInt(String(userId)),
-    }
+  }
+
+  const defaultReservationForm: Reservation = {
+    id: newEventId(),
+    from_reserve: String(new Date()),
+    to_reserve: String(new Date((new Date()).getTime()+3600000)),
+    meetingroom_id: parseInt(String(roomId)),
+    meetingroom: meetingRoom? meetingRoom: {id: 1, name: '', description:  ''},
+    user: user,
+    user_id: parseInt(String(userId)),
   }
   
+  const [ reservationForm, setReservationForm ] = useState<Reservation>(defaultReservationForm);
   const [ modulData, setIsModal ] = useState<ModalData>(defaultModalData);
+  
   function showModal(e: string, reservElement: Reservation) {
     if (e === 'create') {
-      setIsModal({ isModalOpen: true, isCreate: true, reservData: {...reservElement} });
-    } else {
-      setIsModal({ isModalOpen: true, isCreate: false, reservData: {...reservElement} })
+      setIsModal({ ...modulData, isModalOpen: true, isCreate: true });
+      setReservationForm({...reservElement});
+    } else if (e === 'change') {
+      setIsModal({ isModalOpen: true, isCreate: false})
+      setReservationForm({...reservElement});
     }
   }
 
@@ -157,21 +160,19 @@ export function BigCalendarReservations({
         onKeyPressEvent={(e, keyPressed) => deleteEvent(e, keyPressed)}
       >
       </DnDCalendar>
-      {/* <Popover
-        title={<span>cas</span>}
-        content={<span>obvjfhbvd</span>}
-        trigger={'hover'}
-      >
-        <Button>sdvv</Button>
-      </Popover> */}
-      <DataModal
-        isCreate={modulData.isCreate}
-        isModalOpen={modulData.isModalOpen}
-        handleOk={() => {return setIsModal({...modulData, isModalOpen: false})}}
-        handleCancel={() => closeModul()}
-        handelDelete={() => {return setIsModal({...modulData, isModalOpen: false})}}
-        reservForm={modulData.reservData}
-      />
+      {modulData.isModalOpen?
+        <DataModal
+          isCreate={modulData.isCreate}
+          isModalOpen={modulData.isModalOpen}
+          handleOk={() => {return setIsModal({...modulData, isModalOpen: false})}}
+          handleCancel={() => closeModul()}
+          handelDelete={() => {return setIsModal({...modulData, isModalOpen: false})}}
+          handelSetReserv={(reservation) => {return setReservationForm({...reservation})}}
+          reservationForm={reservationForm}
+          handleReservation={(e, k) => handleReservation(e, k)}
+          handleDeleteReservation={(e) => handleDeleteReservation(e)}
+        />
+      : null}
       {/* <Calendar
         defaultView={Views.MONTH}
         onView={() => {}}
@@ -230,22 +231,15 @@ export function BigCalendarReservations({
       events.push(newEvent);
       handleReservation(newEvent, true)
     } else {
-      console.log(e);
-      const k = keys(e)
-      let start, end;
-      k.map(item => {
-        if (String(item) === "start") {
-          start = e[item];
-        } else if (String(item) === "end") {
-          end = e[item];
-        }
+      showModal('create', {
+        id: newEventId(),
+        from_reserve: e.start,
+        to_reserve: e.end,
+        meetingroom_id: parseInt(String(roomId)),
+        meetingroom: {id: 1, name: 'Выберите комнату', description: ''},
+        user: user,
+        user_id: parseInt(String(userId)),
       });
-      if (start && end) {
-        end = new Date(end);
-        start = new Date(start);
-        console.log((end.getTime()-start.getTime())/1000/3600);
-        showModal('create', defaultModalData.reservData);
-      }
     }
   }
 
@@ -264,26 +258,17 @@ export function BigCalendarReservations({
   }
 
   function modalEvent(e: any) {
-    const eResource = keys(e)[keys(e).length - 1];
-    const eResourceKeys = keys(e[eResource]);
-    let eId;
-    eResourceKeys.map(el => {
-      if (el === 'id') {
-        eId = e[eResource][el];
-      }
-    });
-    console.log(e[eResource]);
-    showModal('change', e[eResource]);
+    showModal('change', {...e.resource, from_reserve: e.start, to_reserve: e.end});
   }
 
   //requests
   function dateCustomFormatting(date: Date): string {
-      const padStart = (value: number): string =>
-         value.toString().padStart(2, '0');
-      return(
-         `${padStart(date.getDate())}/${padStart(date.getMonth() + 1)}/${date.getFullYear()} ${padStart(date.getHours())}:${padStart(date.getMinutes())}`
-      );
-   } 
+    const padStart = (value: number): string =>
+       value.toString().padStart(2, '0');
+    return(
+       `${padStart(date.getDate())}/${padStart(date.getMonth() + 1)}/${date.getFullYear()} ${padStart(date.getHours())}:${padStart(date.getMinutes())}`
+    );
+  } 
 
   async function handleReservation(reservationEvent: BigCalendarEvent, isCreate: boolean) {
     const from = reservationEvent.start;
@@ -299,7 +284,7 @@ export function BigCalendarReservations({
       const payload = isCreate? {
         from_reserve: toNaiveISOString(from),
         to_reserve: toNaiveISOString(to),
-        meetingroom_id: roomId,
+        meetingroom_id: parseInt(String(reservationEvent.resource.meetingroom_id)),
         user_id: userId,
       }: {
         from_reserve: toNaiveISOString(from),
@@ -312,7 +297,17 @@ export function BigCalendarReservations({
           :
           await api.patch<Reservation>(`${RESERVATIONS_API}/${reservationEvent.resource.id}`, payload);
 
-        mutateCalendarEvents(res.data, roomId);
+        await mutate(
+          `${MEETING_ROOMS_API}/${roomId}/reservations?history=false`,
+          (data?: Reservation[]) => {
+            if (!data) return data;
+
+            return data.map(item => item === res.data? res.data: item);
+          },
+          {
+            revalidate: true
+          }
+        );
   
         send('success', [`Компьютер '${reservationEvent.title.split(':').pop()?.trim()}' забронирован Вами.${'\n'}Начало брони: ${dateCustomFormatting(from)}${'\n'}Окончание брони: ${dateCustomFormatting(to)}`]);
       } catch (error) {
@@ -321,14 +316,43 @@ export function BigCalendarReservations({
         const even: Reservation = {
           from_reserve: toNaiveISOString(from),
           to_reserve: toNaiveISOString(to),
-          meetingroom_id: roomId? parseInt(String(roomId)): 1,
+          meetingroom_id: parseInt(String(reservationEvent.resource.meetingroom_id)),
           meetingroom: meetingRoom? meetingRoom: {id: 1, name: '', description: ''},
           user: user,
           user_id: parseInt(String(userId)),
           id: parseInt(String(reservationEvent.resource.id)),
         }
 
-        mutateCalendarEvents(even, roomId? roomId: 1)
+        await mutate(
+          `${MEETING_ROOMS_API}/${roomId}/reservations?history=false`,
+          (data?: Reservation[]) => {
+            if (!data) return data;
+
+            return data;
+          },
+          {
+          populateCache: (reserv: Reservation[]) => {
+              // filter the list, and return it with the updated item
+              const filteredTodos = reserv.filter(item => item.id !== 0)
+              return [...filteredTodos, even]
+          },
+          // Since the API already gives us the updated information,
+          // we don't need to revalidate here.
+          revalidate: false
+        })
+
+        await mutate(
+          `${MEETING_ROOMS_API}/${roomId}/reservations?history=false`,
+          (data?: Reservation[]) => {
+            if (!data) return data;
+
+            return data;
+          },
+          {
+            revalidate: true
+          }
+        );
+
       }
     }
   }
@@ -339,7 +363,7 @@ export function BigCalendarReservations({
       if (!confirm) return;
       const res = await api.delete<Reservation>(`${RESERVATIONS_API}/${id}`);
 
-      mutateCalendarEvents(res.data, roomId);
+      mutateCalendarEvents(res.data, roomId, false);
 
       send('success', ['Заявка на бронирование успешно удалена!']);
     } catch (e) {
@@ -373,13 +397,14 @@ export function BigCalendarReservations({
 }
 
 
-async function mutateCalendarEvents(event: Reservation, roomId?: number) {
+async function mutateCalendarEvents(event: Reservation, roomId?: number, create?: boolean) {
   if (!event) return;
-
-  mutate(
+  
+  await mutate(
     `${MEETING_ROOMS_API}/${roomId}/reservations?history=false`,
     (data?: Reservation[]) => {
       if (!data) return data;
+      if (create) return [...data, event];
 
       return data.map((item) => (item.id === event.id? event: item));
     },

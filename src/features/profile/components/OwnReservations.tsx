@@ -35,7 +35,7 @@ const df = dateTimeFormatter;
 
 export function OwnReservationsList() {
   const [history, setHistory] = useState<boolean>(false);
-  const [viewCalendar, setViewCalendar] = useState<boolean>(false);
+  const [viewCalendar, setViewCalendar] = useState<boolean>(true);
   const { send, ctx } = useNotifications();
 
   const reservations = useOwnReservations(history);
