@@ -6,13 +6,6 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 import { calendarConfig } from '../../features/meeting_rooms/calendarConfig';
 import moment from 'moment';
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-import { toNaiveISOString, userConfirmAction } from './utils';
-import { AxiosError } from 'axios';
-import { ResponseApiUnprocessableEntity } from './api/types';
-import { MEETING_ROOMS_API, RESERVATIONS_API } from './constants';
-import { useApi } from './api/useApi';
-import { mutate } from 'swr';
-import { useNotifications } from './hooks/useNotifications';
 import { User } from '@/features/admin/types';
 import { DataModal } from './Modal-rbc';
 
@@ -21,7 +14,7 @@ export interface BigCalendarEvent {
   start: Date;
   end: Date;
   allDay?: boolean;
-  resource?: Partial<Reservation>;
+  resource?: Reservation;
 }
 
 interface BigCalendarReservationsProps {
@@ -30,6 +23,8 @@ interface BigCalendarReservationsProps {
   roomId: number | undefined;
   meetingRoom: MeetingRoom | null;
   user: User;
+  handleReservation: (e: BigCalendarEvent, k: boolean) => void;
+  handleDeleteReservation: (e: number) => void;
 }
 
 interface ModalData {
@@ -49,12 +44,12 @@ export function BigCalendarReservations({
   userId,
   roomId,
   meetingRoom,
-  user
+  user,
+  handleReservation,
+  handleDeleteReservation
 }: BigCalendarReservationsProps) {
   const [activeView, setActiveView] = useState<View>(Views.WEEK);
   const [activeStep, setActiveStep] = useState<number>(30);//calendarConfig.step
-  const api = useApi();
-  const { send, ctx } = useNotifications();
   
   const defaultModalData: ModalData = {
     isCreate: true,
@@ -187,7 +182,6 @@ export function BigCalendarReservations({
         {...calendarConfig}
         step={activeStep}
       /> */}
-      {ctx}
     </div>
   );
 
@@ -253,7 +247,9 @@ export function BigCalendarReservations({
           eId = e[eResource][el];
         }
       });
-      handleDeleteReservation(eId);
+      if (eId) {
+         handleDeleteReservation(eId);
+      }
     }
   }
 
@@ -262,154 +258,5 @@ export function BigCalendarReservations({
   }
 
   //requests
-  function dateCustomFormatting(date: Date): string {
-    const padStart = (value: number): string =>
-       value.toString().padStart(2, '0');
-    return(
-       `${padStart(date.getDate())}/${padStart(date.getMonth() + 1)}/${date.getFullYear()} ${padStart(date.getHours())}:${padStart(date.getMinutes())}`
-    );
-  } 
-
-  async function handleReservation(reservationEvent: BigCalendarEvent, isCreate: boolean) {
-    const from = reservationEvent.start;
-    const to = reservationEvent.end;
-
-    if (from >= to) {
-      send('error', ['Invalid date and time range for reservation']);
-      send('error', ['Время начала брони не может быть больше времени окончания брони']);
-      return;
-    }
-
-    if (reservationEvent.resource) {
-      const payload = isCreate? {
-        from_reserve: toNaiveISOString(from),
-        to_reserve: toNaiveISOString(to),
-        meetingroom_id: parseInt(String(reservationEvent.resource.meetingroom_id)),
-        user_id: userId,
-      }: {
-        from_reserve: toNaiveISOString(from),
-        to_reserve: toNaiveISOString(to),
-      };
-
-      try {
-        const res = isCreate?
-          await api.post<Reservation>(RESERVATIONS_API, payload)
-          :
-          await api.patch<Reservation>(`${RESERVATIONS_API}/${reservationEvent.resource.id}`, payload);
-
-        await mutate(
-          `${MEETING_ROOMS_API}/${roomId}/reservations?history=false`,
-          (data?: Reservation[]) => {
-            if (!data) return data;
-
-            return data.map(item => item === res.data? res.data: item);
-          },
-          {
-            revalidate: true
-          }
-        );
   
-        send('success', [`Компьютер '${reservationEvent.title.split(':').pop()?.trim()}' забронирован Вами.${'\n'}Начало брони: ${dateCustomFormatting(from)}${'\n'}Окончание брони: ${dateCustomFormatting(to)}`]);
-      } catch (error) {
-        errorHandler(error);
-
-        const even: Reservation = {
-          from_reserve: toNaiveISOString(from),
-          to_reserve: toNaiveISOString(to),
-          meetingroom_id: parseInt(String(reservationEvent.resource.meetingroom_id)),
-          meetingroom: meetingRoom? meetingRoom: {id: 1, name: '', description: ''},
-          user: user,
-          user_id: parseInt(String(userId)),
-          id: parseInt(String(reservationEvent.resource.id)),
-        }
-
-        await mutate(
-          `${MEETING_ROOMS_API}/${roomId}/reservations?history=false`,
-          (data?: Reservation[]) => {
-            if (!data) return data;
-
-            return data;
-          },
-          {
-          populateCache: (reserv: Reservation[]) => {
-              // filter the list, and return it with the updated item
-              const filteredTodos = reserv.filter(item => item.id !== 0)
-              return [...filteredTodos, even]
-          },
-          // Since the API already gives us the updated information,
-          // we don't need to revalidate here.
-          revalidate: false
-        })
-
-        await mutate(
-          `${MEETING_ROOMS_API}/${roomId}/reservations?history=false`,
-          (data?: Reservation[]) => {
-            if (!data) return data;
-
-            return data;
-          },
-          {
-            revalidate: true
-          }
-        );
-
-      }
-    }
-  }
-
-  async function handleDeleteReservation(id?: number) {
-    try {
-      const confirm = userConfirmAction(`Удалить заявку на бронирование`);
-      if (!confirm) return;
-      const res = await api.delete<Reservation>(`${RESERVATIONS_API}/${id}`);
-
-      mutateCalendarEvents(res.data, roomId, false);
-
-      send('success', ['Заявка на бронирование успешно удалена!']);
-    } catch (e) {
-      errorHandler(e);
-    }
-  }
-
-  function errorHandler(error: any) {
-    const err = error as AxiosError;
-    
-    if (err.status === 422) {
-      const errHasData = err as AxiosError & {
-        data: ResponseApiUnprocessableEntity;
-      };
-  
-      if (Array.isArray(errHasData.data.detail)) {
-        const errorMessages = errHasData.data.detail
-          .flatMap(({ msg }) => (msg ? [msg] : []))
-          .filter(Boolean);
-  
-        send('error', errorMessages);
-      }
-  
-      if (typeof errHasData.data.detail === 'string') {
-        send('error', [errHasData.data.detail]);
-      }
-    } else {
-      send('error', ['Произошла непредвиденная ошибка']);
-    }
-  }
-}
-
-
-async function mutateCalendarEvents(event: Reservation, roomId?: number, create?: boolean) {
-  if (!event) return;
-  
-  await mutate(
-    `${MEETING_ROOMS_API}/${roomId}/reservations?history=false`,
-    (data?: Reservation[]) => {
-      if (!data) return data;
-      if (create) return [...data, event];
-
-      return data.map((item) => (item.id === event.id? event: item));
-    },
-    {
-      revalidate: true
-    }
-  );
 }

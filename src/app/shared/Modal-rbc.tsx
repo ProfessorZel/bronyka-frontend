@@ -66,6 +66,7 @@ export function DataModal({
             title="Создать бронь"
             closable={{ 'aria-label': 'Custom Close Button' }}
             open={isModalOpen}
+            onCancel={handleCancel}
             footer={!loading? 
                 [!isCreate?
                     <Button 
@@ -117,7 +118,7 @@ export function DataModal({
                                 >
                                     {meetingrooms? meetingrooms.map((room) => {
                                         return(
-                                            <Select.Option value={room.name}>{room.name}</Select.Option>
+                                            <Select.Option key={room.id} value={room.name}>{room.name}</Select.Option>
                                         );
                                     }): null}
                                 </Select>
